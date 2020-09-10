@@ -91,7 +91,7 @@ void bencode::next(bencode::Element& e, const vector<char>& s, size& idx) {
 	}else if(s[idx] == 'd') {
 		e = bencode::parse_dictionary(s, idx);
 	}else {
-		throw invalid_bencode("wrong element in list");
+		throw invalid_bencode("wrong first character");
 	}
 }
 
