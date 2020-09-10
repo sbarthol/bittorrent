@@ -7,6 +7,7 @@ BitTorrent is a small torrenting client written in C++.
 Simply run
 
 ```
+git clone https://github.com/google/googletest.git
 mkdir build
 cd build
 cmake ..
