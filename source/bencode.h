@@ -30,6 +30,8 @@ private:
 
 public:
 
+	bencode() = delete;
+
 	struct invalid_bencode: std::invalid_argument {
 
 		invalid_bencode(): std::invalid_argument("") {}
