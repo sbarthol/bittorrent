@@ -9,58 +9,15 @@
 class bencode {
 
 public:
-	enum type { bs, i, l, d };
+	enum type {bs, i, l, d};
 
 	struct Element {
 
 		std::any data;
 		type t;
 
-		bool operator==(const Element& other) const {
-
-			if(this->t != other.t) return false;
-
-			switch (other.t) {
-
-				case bs: 
-					return std::any_cast<std::vector<char>>(other.data)
-						== std::any_cast<std::vector<char>>(this->data);
-				case i: 
-					return std::any_cast<int>(other.data)
-						== std::any_cast<int>(this->data);
-				case l: 
-					return std::any_cast<std::vector<Element>>(other.data)
-						== std::any_cast<std::vector<Element>>(this->data);
-				case d:
-					return std::any_cast<std::map<Element,Element>>(other.data)
-						== std::any_cast<std::map<Element,Element>>(this->data);
-				default:
-					return false;
-			}
-		}
-
-		bool operator<(const Element& other) const {
-
-			if(this->t != other.t) return this->t < other.t;
-
-			switch (other.t) {
-
-				case bs: 
-					return std::any_cast<std::vector<char>>(other.data)
-						< std::any_cast<std::vector<char>>(this->data);
-				case i: 
-					return std::any_cast<int>(other.data)
-						< std::any_cast<int>(this->data);
-				case l: 
-					return std::any_cast<std::vector<Element>>(other.data)
-						< std::any_cast<std::vector<Element>>(this->data);
-				case d:
-					return std::any_cast<std::map<Element,Element>>(other.data)
-						< std::any_cast<std::map<Element,Element>>(this->data);
-				default:
-					return false;
-			}
-		}
+		bool operator==(const Element& other) const;
+		bool operator<(const Element& other) const;
 	};
 
 private:

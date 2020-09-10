@@ -4,11 +4,6 @@
 
 using namespace std;
 
-// void rec(vector<char> const& s, size idx, Element& parent) {
-
-
-// }
-
 bencode::Element bencode::parse_byte_string(vector<char> const& s, size& idx) {
 
 	// Todo, unallow leading 0s
@@ -210,4 +205,50 @@ void bencode::print(const bencode::Element& e) {
 
 	print_rec(e);
 	cout<<endl;
+}
+
+bool bencode::Element::operator==(const bencode::Element& other) const {
+
+	if(this->t != other.t) return false;
+
+	switch (other.t) {
+
+		case bs: 
+			return std::any_cast<std::vector<char>>(other.data)
+				== std::any_cast<std::vector<char>>(this->data);
+		case i: 
+			return std::any_cast<int>(other.data)
+				== std::any_cast<int>(this->data);
+		case l: 
+			return std::any_cast<std::vector<bencode::Element>>(other.data)
+				== std::any_cast<std::vector<bencode::Element>>(this->data);
+		case d:
+			return std::any_cast<std::map<bencode::Element,bencode::Element>>(other.data)
+				== std::any_cast<std::map<bencode::Element,bencode::Element>>(this->data);
+		default:
+			return false;
+	}
+}
+
+bool bencode::Element::operator<(const bencode::Element& other) const {
+
+	if(this->t != other.t) return this->t < other.t;
+
+	switch (other.t) {
+
+		case bs: 
+			return std::any_cast<std::vector<char>>(other.data)
+				< std::any_cast<std::vector<char>>(this->data);
+		case i: 
+			return std::any_cast<int>(other.data)
+				< std::any_cast<int>(this->data);
+		case l: 
+			return std::any_cast<std::vector<bencode::Element>>(other.data)
+				< std::any_cast<std::vector<bencode::Element>>(this->data);
+		case d:
+			return std::any_cast<std::map<bencode::Element,bencode::Element>>(other.data)
+				< std::any_cast<std::map<bencode::Element,bencode::Element>>(this->data);
+		default:
+			return false;
+	}
 }
