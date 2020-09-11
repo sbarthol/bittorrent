@@ -43,10 +43,7 @@ void udp_client::send(string message) {
 
 string udp_client::receive() {
 
-	socklen_t len;;
-	struct sockaddr_in addr;
-
-	ssize_t n = recv(fd, buff, MAXLINE, MSG_PEEK);
+	ssize_t n = recv(fd, buff, MAXLINE, 0);
 
 	if(n < 0) {
 		string what = strerror(errno);
