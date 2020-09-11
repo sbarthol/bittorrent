@@ -9,21 +9,24 @@ using namespace std;
 
 TEST(udp_client, simple) {
 
-    udp_client client("34.107.107.236", 41234);
+    udp_client client("127.0.0.1", 3333);
 
-    packaged_task<string()> task(bind(&udp_client::receive, &client));
-    future<string> fut = task.get_future();
+    string message = "hello";
+    client.send(message);
+    string ret = client.receive();
 
-    client.send("hello");
+    EXPECT_EQ (message, ret);
+}
 
-    if(fut.wait_for(chrono::seconds(3)) == future_status::timeout) {
-        FAIL() << "receive timed out";
-    }
+TEST(udp_client, dns_lookup) {
 
-    string ret = fut.get();
-    cout<<ret<<endl;
+    udp_client client("tower.sachapro.com", 3333);
 
-    //EXPECT_EQ (tested, expected);
+    string message = "hello";
+    client.send(message);
+    string ret = client.receive();
+
+    EXPECT_EQ (message, ret);
 }
 
 

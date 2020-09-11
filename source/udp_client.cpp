@@ -7,6 +7,7 @@
 #include <sys/errno.h>
 #include <arpa/inet.h>
 #include <string.h>
+#include <netdb.h>
 
 using namespace std;
 
@@ -19,10 +20,17 @@ udp_client::udp_client(string address, int port) {
 	} 
 
 	memset(&servaddr, 0, sizeof(servaddr)); 
+
+	struct hostent *server;
+	server = gethostbyname(address.c_str());
+	if (server == NULL) {
+	    
+		throw runtime_error("host not found");
+	}
 	      
 	servaddr.sin_family = AF_INET; 
 	servaddr.sin_port = htons(port); 
-	servaddr.sin_addr.s_addr = inet_addr(address.c_str());
+	servaddr.sin_addr = *((struct in_addr *)server->h_addr);
 
 	if (connect(fd, (struct sockaddr*)&servaddr,sizeof(servaddr)) < 0) {
 
