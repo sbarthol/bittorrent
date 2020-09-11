@@ -3,6 +3,7 @@
 
 #include <netinet/in.h>
 #include <vector>
+#include <string>
 
 class udp_client {
 

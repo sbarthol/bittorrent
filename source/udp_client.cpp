@@ -6,6 +6,7 @@
 #include <string>
 #include <sys/errno.h>
 #include <arpa/inet.h>
+#include <string.h>
 
 using namespace std;
 
