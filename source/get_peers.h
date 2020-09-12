@@ -11,6 +11,7 @@ private:
 	
 
 public:
+	// Todo this is private
 	static buffer build_conn_req();
 	static buffer get(bencode::item e);
 };

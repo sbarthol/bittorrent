@@ -214,17 +214,17 @@ bool bencode::item::operator==(const bencode::item& other) const {
 	switch (other.t) {
 
 		case bs: 
-			return std::any_cast<buffer>(other.data)
-				== std::any_cast<buffer>(this->data);
+			return any_cast<buffer>(other.data)
+				== any_cast<buffer>(this->data);
 		case i: 
-			return std::any_cast<int>(other.data)
-				== std::any_cast<int>(this->data);
+			return any_cast<int>(other.data)
+				== any_cast<int>(this->data);
 		case l: 
-			return std::any_cast<std::vector<bencode::item>>(other.data)
-				== std::any_cast<std::vector<bencode::item>>(this->data);
+			return any_cast<vector<bencode::item>>(other.data)
+				== any_cast<vector<bencode::item>>(this->data);
 		case d:
-			return std::any_cast<std::map<bencode::item,bencode::item>>(other.data)
-				== std::any_cast<std::map<bencode::item,bencode::item>>(this->data);
+			return any_cast<map<bencode::item,bencode::item>>(other.data)
+				== any_cast<map<bencode::item,bencode::item>>(this->data);
 		default:
 			return false;
 	}
@@ -237,18 +237,31 @@ bool bencode::item::operator<(const bencode::item& other) const {
 	switch (other.t) {
 
 		case bs: 
-			return std::any_cast<buffer>(other.data)
-				< std::any_cast<buffer>(this->data);
+			return any_cast<buffer>(other.data)
+				< any_cast<buffer>(this->data);
 		case i: 
-			return std::any_cast<int>(other.data)
-				< std::any_cast<int>(this->data);
+			return any_cast<int>(other.data)
+				< any_cast<int>(this->data);
 		case l: 
-			return std::any_cast<std::vector<bencode::item>>(other.data)
-				< std::any_cast<std::vector<bencode::item>>(this->data);
+			return any_cast<vector<bencode::item>>(other.data)
+				< any_cast<vector<bencode::item>>(this->data);
 		case d:
-			return std::any_cast<std::map<bencode::item,bencode::item>>(other.data)
-				< std::any_cast<std::map<bencode::item,bencode::item>>(this->data);
+			return any_cast<map<bencode::item,bencode::item>>(other.data)
+				< any_cast<map<bencode::item,bencode::item>>(this->data);
 		default:
 			return false;
 	}
+}
+
+bencode::item bencode::item::operator[](const string& key) const {
+
+	if(this->t != d) throw runtime_error("not a dictionary");
+	map<bencode::item,bencode::item> dic = 
+		any_cast<map<bencode::item,bencode::item>>(this->data);
+
+	bencode::item key_item;
+	key_item.t = bs;
+	key_item.data = buffer(key.begin(), key.end());
+
+	return dic[key_item];
 }

@@ -2,8 +2,7 @@
 #define BUFFER_H
 
 #include <vector>
-#include <algorithm>
 
-typedef std::vector<unsigned char> buffer;
+typedef std::vector<char> buffer;
 
 #endif // BUFFER_H

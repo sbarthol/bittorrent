@@ -19,6 +19,7 @@ public:
 
 		bool operator==(const item& other) const;
 		bool operator<(const item& other) const;
+		item operator[](const std::string& key) const;
 	};
 
 private:
