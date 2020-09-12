@@ -5,28 +5,29 @@
 #include <stdexcept>
 #include <map>
 #include <any>
+#include "buffer.h"
 
 class bencode {
 
 public:
 	enum type {bs, i, l, d};
 
-	struct Element {
+	struct item {
 
 		std::any data;
 		type t;
 
-		bool operator==(const Element& other) const;
-		bool operator<(const Element& other) const;
+		bool operator==(const item& other) const;
+		bool operator<(const item& other) const;
 	};
 
 private:
-	typedef std::vector<char>::size_type size;
-	static void next(bencode::Element& e, const std::vector<char>& s, size& idx);
-	static Element parse_byte_string(std::vector<char> const& s, size& idx);
-	static Element parse_integer(std::vector<char> const& s, size& idx);
-	static Element parse_list(std::vector<char> const& s, size& idx);
-	static Element parse_dictionary(std::vector<char> const& s, size& idx);
+	typedef buffer::size_type size;
+	static void next(bencode::item& e, const buffer& s, size& idx);
+	static item parse_byte_string(buffer const& s, size& idx);
+	static item parse_integer(buffer const& s, size& idx);
+	static item parse_list(buffer const& s, size& idx);
+	static item parse_dictionary(buffer const& s, size& idx);
 
 public:
 
@@ -38,8 +39,8 @@ public:
 		invalid_bencode(const char* what): std::invalid_argument(what) {}
 	};
 
-	static Element parse(std::vector<char> const& s);
-	static void print(const Element& e);
+	static item parse(buffer const& s);
+	static void print(const item& e);
 };
 
 #endif // BENCODE_H

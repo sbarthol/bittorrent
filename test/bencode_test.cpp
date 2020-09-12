@@ -9,16 +9,16 @@ using namespace std;
 
 TEST(byte_string, valid) {
 
-    bencode::Element tested = bencode::parse(vector<char> {'3',':','p','i','e'});
+    bencode::item tested = bencode::parse(buffer {'3',':','p','i','e'});
 
-    bencode::Element expected;
+    bencode::item expected;
     expected.t = bencode::bs;
-    expected.data = vector<char> {'p','i','e'};
+    expected.data = buffer {'p','i','e'};
 
     EXPECT_EQ (tested, expected);
 
-    tested = bencode::parse(vector<char> {'0',':'});
-    expected.data = vector<char>();
+    tested = bencode::parse(buffer {'0',':'});
+    expected.data = buffer();
 
     EXPECT_EQ (tested, expected);
 }
@@ -26,12 +26,12 @@ TEST(byte_string, valid) {
 
 TEST(byte_string, invalid) {
 
-    vector<char> tested1 = vector<char> {'2',':','p','i','e'};
-    vector<char> tested2 = vector<char> {'4',':','p','i','e'};
-    vector<char> tested3 = vector<char> {':','p','i','e'};
-    vector<char> tested4 = vector<char> {'3',':'};
+    buffer tested1 = buffer {'2',':','p','i','e'};
+    buffer tested2 = buffer {'4',':','p','i','e'};
+    buffer tested3 = buffer {':','p','i','e'};
+    buffer tested4 = buffer {'3',':'};
 
-    vector<vector<char>> v {tested1, tested2, tested3, tested4}; 
+    vector<buffer> v {tested1, tested2, tested3, tested4}; 
 
     for(auto t: v) {
     	try {
@@ -47,25 +47,25 @@ TEST(byte_string, invalid) {
 
 TEST(integer, valid) {
 
-    bencode::Element tested = bencode::parse(vector<char> {'i','1','2','e'});
+    bencode::item tested = bencode::parse(buffer {'i','1','2','e'});
 
-    bencode::Element expected;
+    bencode::item expected;
     expected.t = bencode::i;
     expected.data = 12;
 
     EXPECT_EQ (tested, expected);
 
-    tested = bencode::parse(vector<char> {'i','-','1','2','e'});
+    tested = bencode::parse(buffer {'i','-','1','2','e'});
     expected.data = -12;
 
     EXPECT_EQ (tested, expected);
 
-    tested = bencode::parse(vector<char> {'i','-','0','e'});
+    tested = bencode::parse(buffer {'i','-','0','e'});
     expected.data = 0;
 
     EXPECT_EQ (tested, expected);
 
-    tested = bencode::parse(vector<char> {'i','0','e'});
+    tested = bencode::parse(buffer {'i','0','e'});
     expected.data = 0;
 
     EXPECT_EQ (tested, expected);
@@ -74,13 +74,13 @@ TEST(integer, valid) {
 
 TEST(integer, invalid) {
 
-    vector<char> tested1 = vector<char> {'i','-','-','e'};
-    vector<char> tested2 = vector<char> {'i','1','2','3','4'};
-    vector<char> tested3 = vector<char> {'i','1','e','e'};
-    vector<char> tested4 = vector<char> {'i','e'};
-    vector<char> tested5 = vector<char> {'i'};
+    buffer tested1 = buffer {'i','-','-','e'};
+    buffer tested2 = buffer {'i','1','2','3','4'};
+    buffer tested3 = buffer {'i','1','e','e'};
+    buffer tested4 = buffer {'i','e'};
+    buffer tested5 = buffer {'i'};
 
-    vector<vector<char>> v {tested1, tested2, tested3, tested4, tested5}; 
+    vector<buffer> v {tested1, tested2, tested3, tested4, tested5}; 
 
     for(auto t: v) {
     	try {
@@ -97,19 +97,19 @@ TEST(integer, invalid) {
 TEST(list, valid1) {
 
 	string s = "li35e2:abe";
-    bencode::Element tested = bencode::parse(vector<char>(s.begin(), s.end()));
+    bencode::item tested = bencode::parse(buffer(s.begin(), s.end()));
 
-    bencode::Element a;
+    bencode::item a;
     a.t=bencode::i;
     a.data=35;
 
-    bencode::Element b;
+    bencode::item b;
     b.t=bencode::bs;
-    b.data=vector<char>{'a','b'};
+    b.data=buffer{'a','b'};
 
-    bencode::Element expected;
+    bencode::item expected;
     expected.t = bencode::l;
-    expected.data = vector<bencode::Element>{a,b};
+    expected.data = vector<bencode::item>{a,b};
 
     EXPECT_EQ (expected, tested);
 }
@@ -117,23 +117,23 @@ TEST(list, valid1) {
 TEST(list, valid2) {
 
 	string s = "lleli1eee";
-    bencode::Element tested = bencode::parse(vector<char>(s.begin(), s.end()));
+    bencode::item tested = bencode::parse(buffer(s.begin(), s.end()));
 
-    bencode::Element a;
+    bencode::item a;
     a.t=bencode::l;
-    a.data=vector<bencode::Element>();
+    a.data=vector<bencode::item>();
 
-    bencode::Element b;
+    bencode::item b;
     b.t=bencode::i;
     b.data=1;
 
-    bencode::Element c;
+    bencode::item c;
     c.t=bencode::l;
-    c.data=vector<bencode::Element>(1,b);
+    c.data=vector<bencode::item>(1,b);
 
-    bencode::Element expected;
+    bencode::item expected;
     expected.t = bencode::l;
-    expected.data = vector<bencode::Element>{a,c};
+    expected.data = vector<bencode::item>{a,c};
 
     EXPECT_EQ (expected, tested);
 }
@@ -141,13 +141,13 @@ TEST(list, valid2) {
 
 TEST(list, invalid) {
 
-    vector<char> tested1 = vector<char> {'l','i','2','e'};
-    vector<char> tested2 = vector<char> {'l','l'};
-    vector<char> tested3 = vector<char> {'l','x','1','e'};
-    vector<char> tested4 = vector<char> {'l','e','e'};
-    vector<char> tested5 = vector<char> {'l'};
+    buffer tested1 = buffer {'l','i','2','e'};
+    buffer tested2 = buffer {'l','l'};
+    buffer tested3 = buffer {'l','x','1','e'};
+    buffer tested4 = buffer {'l','e','e'};
+    buffer tested5 = buffer {'l'};
 
-    vector<vector<char>> v {tested1, tested2, tested3, tested4, tested5}; 
+    vector<buffer> v {tested1, tested2, tested3, tested4, tested5}; 
 
     for(auto t: v) {
     	try {
@@ -164,29 +164,29 @@ TEST(list, invalid) {
 TEST(dictionary, valid) {
 
 	string s = "d3:bar4:spam3:fooi42ee";
-    bencode::Element tested = bencode::parse(vector<char>(s.begin(), s.end()));
+    bencode::item tested = bencode::parse(buffer(s.begin(), s.end()));
 
-    bencode::Element a;
+    bencode::item a;
     a.t=bencode::bs;
-    a.data=vector<char>{'b','a','r'};
+    a.data=buffer{'b','a','r'};
 
-    bencode::Element b;
+    bencode::item b;
     b.t=bencode::bs;
-    b.data=vector<char>{'s','p','a','m'};
+    b.data=buffer{'s','p','a','m'};
 
-    bencode::Element c;
+    bencode::item c;
     c.t=bencode::bs;
-    c.data=vector<char>{'f','o','o'};
+    c.data=buffer{'f','o','o'};
 
-    bencode::Element d;
+    bencode::item d;
     d.t=bencode::i;
     d.data=42;
 
-    map<bencode::Element,bencode::Element> data;
+    map<bencode::item,bencode::item> data;
     data[a]=b;
     data[c]=d;
 
-    bencode::Element expected;
+    bencode::item expected;
     expected.t = bencode::d;
     expected.data = data;
 
@@ -206,7 +206,7 @@ TEST(dictionary, invalid) {
 
     for(auto s: v) {
     	try {
-    		vector<char> t(s.begin(), s.end());
+    		buffer t(s.begin(), s.end());
     		bencode::parse(t);
     		FAIL() << "Expected bencode::invalid_bencode exception";
     	} catch (bencode::invalid_bencode e) {

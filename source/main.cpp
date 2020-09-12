@@ -4,28 +4,26 @@
 #include <vector>
 #include "bencode.h"
 
-using namespace std;
+buffer get_bytes(std::string filename) {
 
-vector<char> get_bytes(string filename) {
+	std::ifstream is;
+	buffer bytes;
 
-	ifstream is;
-	vector<char> bytes;
-
-	is.open(filename, ios::binary);
-	is.seekg(0, ios::end);
+	is.open(filename, std::ios::binary);
+	is.seekg(0, std::ios::end);
 	size_t filesize=is.tellg();
-	is.seekg(0, ios::beg);
+	is.seekg(0, std::ios::beg);
 
 	bytes.reserve(filesize);
-	bytes.assign(istreambuf_iterator<char>(is),
-	                     istreambuf_iterator<char>());
+	bytes.assign(std::istreambuf_iterator<char>(is),
+	                     std::istreambuf_iterator<char>());
 
 	return bytes;
 }
 
 int main() {
 
-	bencode::Element e = ::bencode::parse(get_bytes("../puppy.torrent"));
+	bencode::item e = bencode::parse(get_bytes("../puppy.torrent"));
 }
 
 /*

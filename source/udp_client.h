@@ -1,9 +1,10 @@
-#ifndef UDP_H
-#define UDP_H
+#ifndef UDP_CLIENT_H
+#define UDP_CLIENT_H
 
 #include <netinet/in.h>
 #include <vector>
 #include <string>
+#include "buffer.h"
 
 class udp_client {
 
@@ -15,8 +16,8 @@ private:
 
 public:
 	udp_client(std::string address, int port);
-	void send(std::string message);
-	std::string receive();
+	void send(buffer message);
+	buffer receive();
 };
 
-#endif // UDP_H
+#endif // UDP_CLIENT_H

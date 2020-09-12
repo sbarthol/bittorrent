@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdexcept>
 #include <sys/socket.h>
-#include <string>
+#include <vector>
 #include <sys/errno.h>
 #include <arpa/inet.h>
 #include <string.h>
@@ -39,7 +39,7 @@ udp_client::udp_client(string address, int port) {
 	}
 }
 
-void udp_client::send(string message) {
+void udp_client::send(buffer message) {
 
 	ssize_t n = ::send(fd, message.data(), message.size(), 0);
 
@@ -49,7 +49,7 @@ void udp_client::send(string message) {
 	}
 }
 
-string udp_client::receive() {
+buffer udp_client::receive() {
 
 	ssize_t n = recv(fd, buff, MAXLINE, 0);
 
@@ -58,5 +58,5 @@ string udp_client::receive() {
 		throw runtime_error(what);
 	}
 	
-	return string(buff,buff+n);
+	return buffer(buff,buff+n);
 }

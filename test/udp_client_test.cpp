@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "udp_client.h"
+#include "buffer.h"
 #include <iostream>
 #include <future>
 #include <chrono>
@@ -7,26 +8,17 @@
 
 using namespace std;
 
-TEST(udp_client, simple) {
-
-    udp_client client("127.0.0.1", 3333);
-
-    string message = "hello";
-    client.send(message);
-    string ret = client.receive();
-
-    EXPECT_EQ (message, ret);
-}
-
 TEST(udp_client, dns_lookup) {
 
     udp_client client("tower.sachapro.com", 3333);
 
     string message = "hello";
-    client.send(message);
-    string ret = client.receive();
+    buffer buff(message.begin(), message.end());
 
-    EXPECT_EQ (message, ret);
+    client.send(buff);
+    buffer ret = client.receive();
+
+    EXPECT_EQ (buff, ret);
 }
 
 
