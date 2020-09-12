@@ -10,7 +10,7 @@ class torrent {
 public:
 
 	buffer info_hash;
-	buffer size;
+	long long length;
 	url_t url;
 
 	torrent(const std::string& filename);
@@ -19,6 +19,7 @@ private:
 
 	buffer get_bytes(const std::string& filename);
 	buffer get_hash_info(const bencode::item& item);
+	long long get_length(const bencode::item& item);
 
 };
 

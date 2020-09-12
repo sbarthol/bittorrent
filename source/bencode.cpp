@@ -63,7 +63,7 @@ bencode::item bencode::parse_integer(buffer const& s, size& idx) {
 		throw invalid_bencode("wrong number");
 	}
 
-	int result = 0;
+	long long result = 0;
 	while(idx < s.size() && '0' <= s[idx] && s[idx] <= '9') {
 		result*=10;
 		result+=s[idx]-'0';
@@ -171,7 +171,7 @@ bencode::item bencode::parse(buffer const& s) {
 static void print_rec(const bencode::item& e) {
 
 	if(e.t==bencode::i){
-		cout<<any_cast<int>(e.data);
+		cout<<any_cast<long long>(e.data);
 	}else if(e.t==bencode::l){
 		auto v=any_cast<vector<bencode::item>>(e.data);
 		cout<<"[";
@@ -218,8 +218,8 @@ bool bencode::item::operator==(const bencode::item& other) const {
 			return any_cast<buffer>(other.data)
 				== any_cast<buffer>(this->data);
 		case i: 
-			return any_cast<int>(other.data)
-				== any_cast<int>(this->data);
+			return any_cast<long long>(other.data)
+				== any_cast<long long>(this->data);
 		case l: 
 			return any_cast<vector<bencode::item>>(other.data)
 				== any_cast<vector<bencode::item>>(this->data);
@@ -241,8 +241,8 @@ bool bencode::item::operator<(const bencode::item& other) const {
 			return any_cast<buffer>(other.data)
 				> any_cast<buffer>(this->data);
 		case i: 
-			return any_cast<int>(other.data)
-				> any_cast<int>(this->data);
+			return any_cast<long long>(other.data)
+				> any_cast<long long>(this->data);
 		case l: 
 			return any_cast<vector<bencode::item>>(other.data)
 				> any_cast<vector<bencode::item>>(this->data);
@@ -285,7 +285,7 @@ bencode::item bencode::item::get_item(const char* key) const {
 	return get(key_item);
 }
 
-int bencode::item::get_int(const char* key) const {
+long long bencode::item::get_int(const char* key) const {
 
 	item key_item;
 	key_item.t = bs;
@@ -294,7 +294,7 @@ int bencode::item::get_int(const char* key) const {
 	item val = get(key_item);
 	if(val.t != i) throw runtime_error("value not of type i");
 
-	return any_cast<int>(val.data);
+	return any_cast<long long>(val.data);
 }
 
 string bencode::item::get_string(const char* key) const {
@@ -307,6 +307,31 @@ string bencode::item::get_string(const char* key) const {
 	return string(buff.begin(), buff.end());
 }
 
+vector<bencode::item> bencode::item::get_list(const char* key) const {
+
+	item key_item;
+	key_item.t = bs;
+	key_item.data = buffer(key, key+strlen(key));
+
+	item val = get(key_item);
+	if(val.t != l) throw runtime_error("value not of type l");
+
+	return any_cast<vector<item>>(val.data);
+}
+
+bool bencode::item::key_present(const char* key) const {
+
+	item key_item;
+	key_item.t = bs;
+	key_item.data = buffer(key, key+strlen(key));
+
+	if(this->t != d) throw runtime_error("not a dictionary");
+	map<bencode::item,bencode::item> dic = 
+		any_cast<map<bencode::item,bencode::item>>(this->data);
+
+	return dic.count(key_item) != 0;
+}
+
 buffer bencode::encode(const bencode::item& e) {
 
 	buffer ans;
@@ -314,7 +339,7 @@ buffer bencode::encode(const bencode::item& e) {
 	if (e.t == i) {
 
 		ans.push_back('i');
-		int x=any_cast<int>(e.data);
+		long long x=any_cast<long long>(e.data);
 		string number = to_string(x);
 		copy(number.begin(), number.end(), back_inserter(ans));
 		ans.push_back('e');

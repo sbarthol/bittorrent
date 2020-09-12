@@ -11,7 +11,7 @@ class peers {
 
 private:
 	static buffer build_conn_req();
-	static buffer build_ann_req(const buffer& b);
+	static buffer build_ann_req(const buffer& b, const torrent& t);
 
 public:
 	static std::vector<std::string> get(const torrent& e);

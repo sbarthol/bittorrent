@@ -13,6 +13,7 @@ torrent::torrent(const string& filename) {
 
 	this->url = item.get_string("announce");
 	this->info_hash = get_hash_info(item);
+	this->length = get_length(item);
 }
 
 buffer torrent::get_bytes(const string& filename) {
@@ -43,4 +44,24 @@ buffer torrent::get_hash_info(const bencode::item& item) {
 	SHA1(encoded.data(), encoded.size(), buff);
 
 	return buffer(buff,buff+SIZE_SHA1);
+}
+
+long long torrent::get_length(const bencode::item& item) {
+
+	long long length = 0;
+
+	bencode::item info = item.get_item("info");
+	if(info.key_present("files")) {
+
+		vector<bencode::item> files = info.get_list("files");
+		for (bencode::item& file:files) {
+			length += file.get_int("length");
+		}
+
+	} else {
+
+		length = info.get_int("length");
+	}
+
+	return length;
 }

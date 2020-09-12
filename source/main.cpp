@@ -8,6 +8,7 @@ int main() {
 	torrent t("../puppy.torrent");
 	cout<<t.url.host<<endl;
 	cout<<t.url.port<<endl;
+	cout<<t.length<<endl;
 
 	for(unsigned char c:t.info_hash){
 		cout<<hex<<(int)c<<" ";
