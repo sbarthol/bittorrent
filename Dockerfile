@@ -8,7 +8,8 @@ RUN apt-get -y update && \
       cmake \
       g++ \
       man \
-      manpages-posix
+      manpages-posix \
+      libssl-dev
 
 WORKDIR /app/build
 

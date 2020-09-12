@@ -1,6 +1,7 @@
 #include "bencode.h"
 #include <algorithm>
 #include <iostream>
+#include <string.h>
 
 using namespace std;
 
@@ -238,16 +239,16 @@ bool bencode::item::operator<(const bencode::item& other) const {
 
 		case bs: 
 			return any_cast<buffer>(other.data)
-				< any_cast<buffer>(this->data);
+				> any_cast<buffer>(this->data);
 		case i: 
 			return any_cast<int>(other.data)
-				< any_cast<int>(this->data);
+				> any_cast<int>(this->data);
 		case l: 
 			return any_cast<vector<bencode::item>>(other.data)
-				< any_cast<vector<bencode::item>>(this->data);
+				> any_cast<vector<bencode::item>>(this->data);
 		case d:
 			return any_cast<map<bencode::item,bencode::item>>(other.data)
-				< any_cast<map<bencode::item,bencode::item>>(this->data);
+				> any_cast<map<bencode::item,bencode::item>>(this->data);
 		default:
 			return false;
 	}
@@ -273,6 +274,15 @@ buffer bencode::item::get_buffer(const char* key) const {
 	if(val.t != bs) throw runtime_error("value not of type bs");
 
 	return any_cast<buffer>(val.data);
+}
+
+bencode::item bencode::item::get_item(const char* key) const {
+
+	item key_item;
+	key_item.t = bs;
+	key_item.data = buffer(key, key+strlen(key));
+
+	return get(key_item);
 }
 
 int bencode::item::get_int(const char* key) const {

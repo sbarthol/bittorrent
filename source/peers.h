@@ -1,7 +1,7 @@
 #ifndef PEERS_H
 #define PEERS_H
 
-#include "bencode.h"
+#include "torrent.h"
 #include "udp.h"
 #include "buffer.h"
 #include <vector>
@@ -14,7 +14,7 @@ private:
 	static buffer build_ann_req(const buffer& b);
 
 public:
-	static std::vector<std::string> get(bencode::item e);
+	static std::vector<std::string> get(const torrent& e);
 };
 
 #endif // PEERS_H

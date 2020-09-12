@@ -1,15 +1,15 @@
 #ifndef URL_H
 #define URL_H
 
-#include "bencode.h"
 #include <string>
 
-struct url {
+struct url_t {
 
 	std::string host;
 	int port;
 
-	url(const bencode::item& file);
+	url_t(const std::string& url);
+	url_t() {};
 };
 
 #endif // URL_H

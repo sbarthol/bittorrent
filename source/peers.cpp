@@ -44,15 +44,15 @@ buffer peers::build_ann_req(const buffer& b) {
 	return buff;
 }
 
-vector<string> peers::get(bencode::item e) {
+vector<string> peers::get(const torrent& e) {
 
-	srand(time(NULL));
+	// srand(time(NULL));
 
-	url url(e);
+	// url url(e);
 	
-	udp client(url.host, url.port);
-	client.send(build_conn_req());
-	buffer b = client.receive();
+	// udp client(url.host, url.port);
+	// client.send(build_conn_req());
+	// buffer b = client.receive();
 
 	return vector<string>();
 

@@ -2,14 +2,24 @@
 #define TORRENT_H
 
 #include "buffer.h"
+#include "url.h"
+#include "bencode.h"
 
-class torrent {
-
-private:
-	buffer info_hash;
+class torrent {	
 
 public:
-	torrent(const char* filename);
+
+	buffer info_hash;
+	buffer size;
+	url_t url;
+
+	torrent(const std::string& filename);
+
+private:
+
+	buffer get_bytes(const std::string& filename);
+	buffer get_hash_info(const bencode::item& item);
+
 };
 
 #endif // TORRENT_H

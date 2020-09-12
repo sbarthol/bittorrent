@@ -4,9 +4,9 @@
 
 using namespace std;
 
-url::url(const bencode::item& file) {
+url_t::url_t(const string& url) {
 
-	string s = file.get_string("announce");
+	string s = url;
 
 	string pref = "udp://";
 	s.erase(0,pref.size());

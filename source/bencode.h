@@ -24,7 +24,7 @@ public:
 		buffer get_buffer(const char* key) const;
 		int get_int(const char* key) const;
 		std::string get_string(const char* key) const;
-
+		item get_item(const char* key) const;
 	private:
 		item get(const item& key) const;
 	};

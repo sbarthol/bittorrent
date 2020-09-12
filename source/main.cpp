@@ -1,46 +1,18 @@
+#include "torrent.h"
 #include <iostream>
-#include <iterator>
-#include <fstream>
-#include <vector>
-#include "bencode.h"
-#include <stdexcept>
-#include "udp.h"
-#include "peers.h"
-#include "url.h"
 
-buffer get_bytes(std::string filename) {
-
-	std::ifstream is;
-	buffer bytes;
-
-	is.open(filename, std::ios::binary);
-	is.seekg(0, std::ios::end);
-	size_t filesize=is.tellg();
-	is.seekg(0, std::ios::beg);
-
-	bytes.reserve(filesize);
-	bytes.assign(std::istreambuf_iterator<char>(is),
-	                     std::istreambuf_iterator<char>());
-
-	return bytes;
-}
+using namespace std;
 
 int main() {
 
-	// bencode::item e = bencode::parse(get_bytes("../puppy.torrent"));
+	torrent t("../puppy.torrent");
+	cout<<t.url.host<<endl;
+	cout<<t.url.port<<endl;
 
-	// using namespace std;
-
-	// url url(e);
-	
-	// udp client(url.host, url.port);
-	// client.send(peers::build_conn_req());
-	// buffer b = client.receive();
-	
-	// for(unsigned char c:b)cout<<hex<<(int)c<<" ";
-	// cout<<endl;
-
-	// 0 0 0 0 - 36 c6 95 3d - 80 65 e1 4f c0 b2 aa 3e
+	for(unsigned char c:t.info_hash){
+		cout<<hex<<(int)c<<" ";
+	}
+	cout<<endl;
 }
 
 /*
