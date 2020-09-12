@@ -1,4 +1,4 @@
-#include "udp_client.h"
+#include "udp.h"
 #include <sys/socket.h>
 #include <stdio.h>
 #include <stdexcept>
@@ -11,7 +11,7 @@
 
 using namespace std;
 
-udp_client::udp_client(string address, int port) {
+udp::udp(string address, int port) {
 
 	if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) { 
 
@@ -39,7 +39,7 @@ udp_client::udp_client(string address, int port) {
 	}
 }
 
-void udp_client::send(buffer message) {
+void udp::send(buffer message) {
 
 	ssize_t n = ::send(fd, message.data(), message.size(), 0);
 
@@ -49,7 +49,7 @@ void udp_client::send(buffer message) {
 	}
 }
 
-buffer udp_client::receive() {
+buffer udp::receive() {
 
 	ssize_t n = recv(fd, buff, MAXLINE, 0);
 

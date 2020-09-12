@@ -2,7 +2,7 @@
 #define PEERS_H
 
 #include "bencode.h"
-#include "udp_client.h"
+#include "udp.h"
 #include "buffer.h"
 
 class peers {

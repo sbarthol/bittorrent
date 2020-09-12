@@ -1,12 +1,12 @@
-#ifndef UDP_CLIENT_H
-#define UDP_CLIENT_H
+#ifndef UDP_H
+#define UDP_H
 
 #include <netinet/in.h>
 #include <vector>
 #include <string>
 #include "buffer.h"
 
-class udp_client {
+class udp {
 
 private:
 	struct sockaddr_in servaddr; 
@@ -15,9 +15,9 @@ private:
 	char buff[MAXLINE];
 
 public:
-	udp_client(std::string address, int port);
+	udp(std::string address, int port);
 	void send(buffer message);
 	buffer receive();
 };
 
-#endif // UDP_CLIENT_H
+#endif // UDP_H
