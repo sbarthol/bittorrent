@@ -6,6 +6,7 @@
 #include <map>
 #include <any>
 #include "buffer.h"
+#include <string>
 
 class bencode {
 
@@ -19,7 +20,13 @@ public:
 
 		bool operator==(const item& other) const;
 		bool operator<(const item& other) const;
-		item operator[](const std::string& key) const;
+
+		buffer get_buffer(const char* key) const;
+		int get_int(const char* key) const;
+		std::string get_string(const char* key) const;
+
+	private:
+		item get(const item& key) const;
 	};
 
 private:
@@ -41,6 +48,7 @@ public:
 	};
 
 	static item parse(buffer const& s);
+	static buffer encode(item const& e);
 	static void print(const item& e);
 };
 

@@ -3,6 +3,6 @@
 
 #include <vector>
 
-typedef std::vector<char> buffer;
+typedef std::vector<unsigned char> buffer;
 
 #endif // BUFFER_H

@@ -253,15 +253,97 @@ bool bencode::item::operator<(const bencode::item& other) const {
 	}
 }
 
-bencode::item bencode::item::operator[](const string& key) const {
+bencode::item bencode::item::get(const item& key) const {
 
 	if(this->t != d) throw runtime_error("not a dictionary");
 	map<bencode::item,bencode::item> dic = 
 		any_cast<map<bencode::item,bencode::item>>(this->data);
 
-	bencode::item key_item;
-	key_item.t = bs;
-	key_item.data = buffer(key.begin(), key.end());
+	if(dic.count(key) == 0) throw runtime_error("no key in dictionary");
+	return dic[key];
+}
 
-	return dic[key_item];
+buffer bencode::item::get_buffer(const char* key) const {
+
+	item key_item;
+	key_item.t = bs;
+	key_item.data = buffer(key, key+strlen(key));
+
+	item val = get(key_item);
+	if(val.t != bs) throw runtime_error("value not of type bs");
+
+	return any_cast<buffer>(val.data);
+}
+
+int bencode::item::get_int(const char* key) const {
+
+	item key_item;
+	key_item.t = bs;
+	key_item.data = buffer(key, key+strlen(key));
+
+	item val = get(key_item);
+	if(val.t != i) throw runtime_error("value not of type i");
+
+	return any_cast<int>(val.data);
+}
+
+string bencode::item::get_string(const char* key) const {
+
+	buffer buff = get_buffer(key);
+	for(char c:buff){
+		if(c<0) throw runtime_error("not a valid ASCII buffer");
+	}
+
+	return string(buff.begin(), buff.end());
+}
+
+buffer bencode::encode(const bencode::item& e) {
+
+	buffer ans;
+
+	if (e.t == i) {
+
+		ans.push_back('i');
+		int x=any_cast<int>(e.data);
+		string number = to_string(x);
+		copy(number.begin(), number.end(), back_inserter(ans));
+		ans.push_back('e');
+
+	} else if (e.t == bs) {
+
+		buffer x = any_cast<buffer>(e.data);
+		int len = x.size();
+		string number = to_string(len);
+		copy(number.begin(), number.end(), back_inserter(ans));
+		ans.push_back(':');
+		copy(x.begin(), x.end(), back_inserter(ans));
+
+	} else if (e.t == l) {
+
+		vector<item> v = any_cast<vector<item>>(e.data);
+		ans.push_back('l');
+		for(item i:v){
+			buffer tmp=encode(i);
+			copy(tmp.begin(), tmp.end(), back_inserter(ans));
+		}
+		ans.push_back('e');
+
+	} else if (e.t == d) {
+
+		map<item,item> m = any_cast<map<item,item>>(e.data);
+		ans.push_back('d');
+		for(pair<item,item> i:m){
+			buffer tmp=encode(i.first);
+			copy(tmp.begin(), tmp.end(), back_inserter(ans));
+			tmp=encode(i.second);
+			copy(tmp.begin(), tmp.end(), back_inserter(ans));
+		}
+		ans.push_back('e');
+
+	} else {
+
+		throw invalid_bencode("invalid element found");
+	}
+
+	return ans;
 }

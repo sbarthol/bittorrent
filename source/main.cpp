@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include "udp.h"
 #include "peers.h"
+#include "url.h"
 
 buffer get_bytes(std::string filename) {
 
@@ -26,22 +27,18 @@ buffer get_bytes(std::string filename) {
 
 int main() {
 
-	bencode::item e = bencode::parse(get_bytes("../puppy.torrent"));
-	bencode::item url_bencode = e["announce"];
+	// bencode::item e = bencode::parse(get_bytes("../puppy.torrent"));
 
-	bencode::print(url_bencode);
+	// using namespace std;
 
-	if(url_bencode.t != bencode::bs) throw std::runtime_error("announce is not a byte string");
-	std::cout<<"ici"<<std::endl;
-	buffer url_buffer = std::any_cast<buffer>(url_bencode.data);
-	std::string s(url_buffer.begin(), url_buffer.end());
-	std::cout<<s<<std::endl;
-
-	udp client("tracker.coppersurfer.tk", 6969);
-	client.send(peers::build_conn_req());
-	buffer b = client.receive();
-	for(unsigned char c:b)std::cout<<std::hex<<(int)c<<" ";
-	std::cout<<std::endl;
+	// url url(e);
+	
+	// udp client(url.host, url.port);
+	// client.send(peers::build_conn_req());
+	// buffer b = client.receive();
+	
+	// for(unsigned char c:b)cout<<hex<<(int)c<<" ";
+	// cout<<endl;
 
 	// 0 0 0 0 - 36 c6 95 3d - 80 65 e1 4f c0 b2 aa 3e
 }

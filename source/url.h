@@ -1,8 +1,15 @@
 #ifndef URL_H
 #define URL_H
 
-#include 
+#include "bencode.h"
+#include <string>
 
-typedef std::vector<char> URL;
+struct url {
+
+	std::string host;
+	int port;
+
+	url(const bencode::item& file);
+};
 
 #endif // URL_H

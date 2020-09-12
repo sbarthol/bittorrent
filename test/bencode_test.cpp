@@ -216,3 +216,63 @@ TEST(dictionary, invalid) {
     	}
     }
 }
+
+TEST(encode, valid) {
+
+    string s = "d3:barli-1ei34e3:samee";
+    buffer t(s.begin(), s.end());
+    bencode::item e = bencode::parse(t);
+
+    buffer r = bencode::encode(e);
+
+    EXPECT_EQ (t, r);
+}
+
+TEST(subscript, integer) {
+
+    string s="d3:sami34ee";
+    buffer t(s.begin(), s.end());
+    bencode::item e = bencode::parse(t);
+
+    int val = e.get_int("sam");
+    EXPECT_EQ (val, 34);
+}
+
+TEST(subscript, buffer) {
+
+    string s="d3:sam3:t\x88me";
+    buffer t(s.begin(), s.end());
+    bencode::item e = bencode::parse(t);
+
+    buffer val = e.get_buffer("sam");
+    buffer expected {'t',0x88,'m'};
+    EXPECT_EQ (val, expected);
+}
+
+TEST(subscript, string_invalid) {
+
+    string s="d3:sam3:t\x88me";
+    buffer t(s.begin(), s.end());
+    bencode::item e = bencode::parse(t);
+
+    try {
+        e.get_string("sam");
+        FAIL() << "Expected to fail";
+    } catch (runtime_error e) {
+
+    } catch (...) {
+        FAIL() << "Wrong exception";
+    }
+}
+
+TEST(subscript, string_valid) {
+
+    string s="d3:sam3:tome";
+    buffer t(s.begin(), s.end());
+    bencode::item e = bencode::parse(t);
+
+    string val = e.get_string("sam");
+    string expected = "tom";
+    EXPECT_EQ (val, expected);
+
+}
