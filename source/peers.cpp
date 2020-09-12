@@ -1,11 +1,11 @@
-#include "get_peers.h"
+#include "peers.h"
 #include <stdlib.h> 
 #include <time.h>
 #include <vector>
 
 using namespace std;
 
-buffer get_peers::build_conn_req() {
+buffer peers::build_conn_req() {
 
 	#define SIZE 16
 	#define RANDOM_SIZE 4

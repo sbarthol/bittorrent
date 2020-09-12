@@ -5,7 +5,7 @@
 #include "bencode.h"
 #include <stdexcept>
 #include "udp_client.h"
-#include "get_peers.h"
+#include "peers.h"
 
 buffer get_bytes(std::string filename) {
 
@@ -38,7 +38,7 @@ int main() {
 	std::cout<<s<<std::endl;
 
 	udp_client client("tracker.coppersurfer.tk", 6969);
-	client.send(get_peers::build_conn_req());
+	client.send(peers::build_conn_req());
 	buffer b = client.receive();
 	for(unsigned char c:b)std::cout<<std::hex<<(int)c<<" ";
 	std::cout<<std::endl;
