@@ -1,4 +1,4 @@
-#include "peers.h"
+#include "tracker.h"
 #include <stdlib.h> 
 #include <time.h>
 #include <vector>
@@ -8,7 +8,7 @@
 
 using namespace std;
 
-buffer peers::build_conn_req() {
+buffer tracker::build_conn_req() {
 
 	#define SIZE_CONN 16
 	#define RANDOM_SIZE 4
@@ -24,7 +24,7 @@ buffer peers::build_conn_req() {
 	return buffer(msg,msg+SIZE_CONN);
 }
 
-buffer peers::build_ann_req(const buffer& b, const torrent& t) {
+buffer tracker::build_ann_req(const buffer& b, const torrent& t) {
 
 	#define SIZE_ANN 98
 
@@ -43,6 +43,7 @@ buffer peers::build_ann_req(const buffer& b, const torrent& t) {
 	copy(t.info_hash.begin(), t.info_hash.end(), buff.begin()+16);
 
 	// peer id
+	// Todo: id stays the same until app closes
 	string my_id = "-SA0001-";
 	copy(my_id.begin(), my_id.end(), buff.begin()+36);
 	for(int i=0;i+my_id.size()<20;i++){
@@ -67,6 +68,7 @@ buffer peers::build_ann_req(const buffer& b, const torrent& t) {
 	}
 
 	// port
+	// Todo: allow port between 6881 and 6889
 	int port = 6881;
 	buff[97] = port % 256;
 	buff[96] = (port / 256) % 256;
@@ -74,7 +76,7 @@ buffer peers::build_ann_req(const buffer& b, const torrent& t) {
 	return buff;
 }
 
-vector<string> peers::get(const torrent& t) {
+buffer tracker::get_peers(const torrent& t) {
 
 	srand(time(NULL));
 	
@@ -85,6 +87,6 @@ vector<string> peers::get(const torrent& t) {
 	client.send(build_ann_req(b, t));
 	buffer c = client.receive();
 
-	return vector<string>();
+	return c;
 
 }
