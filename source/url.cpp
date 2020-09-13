@@ -19,7 +19,7 @@ url_t::url_t(const string& url) {
 
 	} else if(s.substr(0,pref_http.size()) == pref_http) {
 		s.erase(0,pref_http.size());
-		this->protocol = TCP;
+		this->protocol = HTTP;
 
 	} else {
 		throw runtime_error("undefined protocol in url");

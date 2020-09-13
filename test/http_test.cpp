@@ -2,6 +2,7 @@
 #include "buffer.h"
 #include "url.h"
 #include "http.h"
+#include <iostream>
 
 using namespace std;
 
@@ -12,13 +13,16 @@ TEST(http, simple) {
 	EXPECT_EQ(url.host, "tower.sachapro.com");
 	EXPECT_EQ(url.port, 8888);
 	EXPECT_EQ(url.path, "/oktamer");
-	EXPECT_EQ(url.protocol, url_t::TCP);
+	EXPECT_EQ(url.protocol, url_t::HTTP);
 
-    // http request(url);
-    // request.add_argument("abc", "123");
-    // request.add_argument("efg", buffer{0x88, 0x99, 0xAA});
+    http request(url);
+    request.add_argument("abc", "123");
+    request.add_argument("efg", "456");
 
-    //buffer response = request.get();
+    buffer body = request.get();
+    buffer expected {'1','2','3','4','5','6'};
+    EXPECT_EQ(body, expected);
+
 }
 
 TEST(url, simple) {

@@ -1,13 +1,19 @@
 #include "http.h"
 #include <algorithm>
 #include <string>
+#include <stdexcept>
 
 using namespace std;
 
 http::http(const url_t& url): 
 	socket(url.host, url.port), url(url), n_args(0) {
 		
-		path = buffer(url.path.begin(), url.path.end());
+		if (url.protocol != url_t::HTTP) {
+			throw runtime_error("url is not a http url");
+		}
+
+		this->url = url;
+		this->path = buffer(url.path.begin(), url.path.end());
 }
 
 void http::add_argument(const string& key, const buffer& value) {
@@ -63,12 +69,28 @@ buffer http::get() {
 	append("Accept: */*", payload);
 
 	append(CRLF, payload);
+	append(CRLF, payload);
 
 	socket.send(payload);
-	return socket.receive();
+	buffer response = socket.receive();
+
+	buffer::size_type pos_body = -1;
+	for(buffer::size_type i = 0; i + 3 < response.size(); i++) {
+
+		if(response[i] == '\r' 
+			&& response[i+1] == '\n' 
+			&& response[i+2] == '\r' 
+			&& response[i+3] == '\n') {
+
+			pos_body = i + 4;
+		}
+	}
+
+	if(pos_body == -1) return buffer();
+	return buffer(response.begin() + pos_body, response.end());
 }
 
 // GET /search?q=test HTTP/1.1\r\n
 // Host: www.bing.com\r\n
 // User-Agent: sacha_torrent/1.0\r\n
-// Accept: */*\r\n
+// Accept: */*\r\n\r\n

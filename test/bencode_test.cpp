@@ -51,22 +51,22 @@ TEST(integer, valid) {
 
     bencode::item expected;
     expected.t = bencode::i;
-    expected.data = 12;
+    expected.data = 12ll;
 
     EXPECT_EQ (tested, expected);
 
     tested = bencode::parse(buffer {'i','-','1','2','e'});
-    expected.data = -12;
+    expected.data = -12ll;
 
     EXPECT_EQ (tested, expected);
 
     tested = bencode::parse(buffer {'i','-','0','e'});
-    expected.data = 0;
+    expected.data = 0ll;
 
     EXPECT_EQ (tested, expected);
 
     tested = bencode::parse(buffer {'i','0','e'});
-    expected.data = 0;
+    expected.data = 0ll;
 
     EXPECT_EQ (tested, expected);
 }
@@ -101,7 +101,7 @@ TEST(list, valid1) {
 
     bencode::item a;
     a.t=bencode::i;
-    a.data=35;
+    a.data=35ll;
 
     bencode::item b;
     b.t=bencode::bs;
@@ -125,7 +125,7 @@ TEST(list, valid2) {
 
     bencode::item b;
     b.t=bencode::i;
-    b.data=1;
+    b.data=1ll;
 
     bencode::item c;
     c.t=bencode::l;
@@ -180,7 +180,7 @@ TEST(dictionary, valid) {
 
     bencode::item d;
     d.t=bencode::i;
-    d.data=42;
+    d.data=42ll;
 
     map<bencode::item,bencode::item> data;
     data[a]=b;
@@ -234,8 +234,8 @@ TEST(subscript, integer) {
     buffer t(s.begin(), s.end());
     bencode::item e = bencode::parse(t);
 
-    int val = e.get_int("sam");
-    EXPECT_EQ (val, 34);
+    long long val = e.get_int("sam");
+    EXPECT_EQ (val, 34ll);
 }
 
 TEST(subscript, buffer) {

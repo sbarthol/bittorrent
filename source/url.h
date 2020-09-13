@@ -9,7 +9,7 @@ struct url_t {
 	std::string path;
 	int port;
 
-	enum {UDP, TCP} protocol;
+	enum {UDP, HTTP} protocol;
 
 	url_t(const std::string& url);
 	url_t() {};
