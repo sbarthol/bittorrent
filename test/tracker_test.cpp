@@ -9,7 +9,7 @@ using namespace std;
 
 TEST(tracker, simple) {
 
-    torrent t("../puppy.torrent");
+    torrent t("../goosebumps.torrent");
     buffer b = tracker::get_peers(t);
 
     for(int i=0;i<b.size();i+=4){
@@ -19,5 +19,6 @@ TEST(tracker, simple) {
     	puts("");
     }
 
-    //EXPECT_EQ (tested, expected);
+    EXPECT_EQ(b[3],1);
+    EXPECT_TRUE(b.size()>5*4);
 }

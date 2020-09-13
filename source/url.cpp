@@ -8,8 +8,16 @@ url_t::url_t(const string& url) {
 
 	string s = url;
 
-	string pref = "udp://";
-	s.erase(0,pref.size());
+	string pref_udp = "udp://";
+	if(s.substr(0,pref_udp.size()) == pref_udp) {
+		s.erase(0,pref_udp.size());
+	}
+
+	string pref_http = "http://";
+	if(s.substr(0,pref_http.size()) == pref_http) {
+		s.erase(0,pref_http.size());
+	}
+	
 
 	auto it = find(s.begin(), s.end(), ':');
 	string host;

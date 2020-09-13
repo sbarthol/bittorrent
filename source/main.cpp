@@ -5,7 +5,7 @@ using namespace std;
 
 int main() {
 
-	torrent t("../puppy.torrent");
+	torrent t("../goosebumps.torrent");
 	cout<<t.url.host<<endl;
 	cout<<t.url.port<<endl;
 	cout<<t.length<<endl;

@@ -1,4 +1,4 @@
-#include "udp.h"
+#include "transport.h"
 #include <sys/socket.h>
 #include <stdio.h>
 #include <stdexcept>
@@ -11,15 +11,15 @@
 
 using namespace std;
 
-udp::udp(string address, int port) {
+transport::transport(string address, int port, int type) {
 
-	if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) { 
+	if ((fd = socket(AF_INET, type, 0)) < 0) { 
 
 		string what = strerror(errno);
 		throw runtime_error(what);
 	} 
 
-	memset(&servaddr, 0, sizeof(servaddr)); 
+	bzero(&servaddr, sizeof(servaddr)); 
 
 	struct hostent *server;
 	server = gethostbyname(address.c_str());
@@ -39,7 +39,7 @@ udp::udp(string address, int port) {
 	}
 }
 
-void udp::send(buffer message) {
+void transport::send(buffer message) {
 
 	ssize_t n = ::send(fd, message.data(), message.size(), 0);
 
@@ -49,7 +49,7 @@ void udp::send(buffer message) {
 	}
 }
 
-buffer udp::receive() {
+buffer transport::receive() {
 
 	ssize_t n = recv(fd, buff, MAXLINE, 0);
 
