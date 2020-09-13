@@ -5,6 +5,7 @@
 #include "udp.h"
 #include "url.h"
 #include <algorithm>
+#include <stdexcept>
 
 using namespace std;
 
@@ -22,6 +23,32 @@ buffer tracker::build_conn_req() {
 	}
 
 	return buffer(msg,msg+SIZE_CONN);
+}
+
+void tracker::build_ann_req_http(http& request, const torrent& t) {
+
+	// info_hash
+	request.add_argument("info_hash", t.info_hash);
+
+	//peer_id
+	// Todo: id stays the same until app closes
+	string peer_id = "-SA0001-";
+	for(int i=0;i+peer_id.size()<20;i++){
+		peer_id.push_back(rand() % 256);
+	}
+	request.add_argument("peer_id", peer_id);
+
+	// port
+	request.add_argument("port", "6881");
+
+	// uploaded
+	request.add_argument("uploaded", "0");
+
+	// downloaded
+	request.add_argument("downloaded", "0");
+
+	// left
+	request.add_argument("left", to_string(t.length));
 }
 
 buffer tracker::build_ann_req(const buffer& b, const torrent& t) {
@@ -44,10 +71,10 @@ buffer tracker::build_ann_req(const buffer& b, const torrent& t) {
 
 	// peer id
 	// Todo: id stays the same until app closes
-	string my_id = "-SA0001-";
-	copy(my_id.begin(), my_id.end(), buff.begin()+36);
-	for(int i=0;i+my_id.size()<20;i++){
-		buff[36+my_id.size()+i] = rand() % 256;
+	string peer_id = "-SA0001-";
+	copy(peer_id.begin(), peer_id.end(), buff.begin()+36);
+	for(int i=0;i+peer_id.size()<20;i++){
+		buff[36+peer_id.size()+i] = rand() % 256;
 	}
 
 	// left
@@ -80,13 +107,21 @@ buffer tracker::get_peers(const torrent& t) {
 
 	srand(time(NULL));
 	
-	udp client(t.url.host, t.url.port);
-	client.send(build_conn_req());
-	buffer b = client.receive();
+	if (t.url.protocol == url_t::UDP) {
 
-	client.send(build_ann_req(b, t));
-	buffer c = client.receive();
+		udp client(t.url.host, t.url.port);
+		client.send(build_conn_req());
+		buffer b = client.receive();
 
-	return c;
+		client.send(build_ann_req(b, t));
+		return client.receive();
 
+	} else if (t.url.protocol == url_t::HTTP) {
+
+		http request(t.url);
+		build_ann_req_http(request, t);
+		return request.get();
+	}
+
+	throw runtime_error("protocol not recognized");
 }

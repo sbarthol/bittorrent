@@ -4,6 +4,7 @@
 #include "torrent.h"
 #include "buffer.h"
 #include <stdio.h>
+#include <iostream>
 
 using namespace std;
 
@@ -12,13 +13,25 @@ TEST(tracker, simple) {
     torrent t("../goosebumps.torrent");
     buffer b = tracker::get_peers(t);
 
-    for(int i=0;i<b.size();i+=4){
-    	for(int j=0;j<4&&i+j<b.size();j++){
-    		printf("%02X ",b[i+j]);
-    	}
-    	puts("");
-    }
-
-    EXPECT_EQ(b[3],1);
-    EXPECT_TRUE(b.size()>5*4);
+    for(char c:b)cout<<c;
+    cout<<endl;
 }
+
+/*
+
+
+{
+    "announce":"http://tracker.yggtracker.cc:8080/IEBVvI0dWAS5pBBKtKDpggBzr00fImwa/announce",
+    "created by":"YggTorrent",
+    "creation date":1599953075,
+    "info":{
+            "length":2202273313,
+            "name":"Goosebumps.2.2018.MULTI.TRUEFRENCH.1080p.BluRay.HDLight.x264.AC3-TOXIC.mkv",
+            "piece length":524288,
+            "pieces":"...",
+            "private":1
+            }
+}
+
+
+*/
