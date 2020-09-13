@@ -33,8 +33,10 @@ void tracker::build_ann_req_http(http& request, const torrent& t) {
 	//peer_id
 	// Todo: id stays the same until app closes
 	string peer_id = "-SA0001-";
-	for(int i=0;i+peer_id.size()<20;i++){
-		peer_id.push_back(rand() % 256);
+	int peer_id_size = peer_id.size();
+
+	for(int i=0;i+peer_id_size<20;i++){
+		peer_id.push_back('x');
 	}
 	request.add_argument("peer_id", peer_id);
 
@@ -74,7 +76,7 @@ buffer tracker::build_ann_req(const buffer& b, const torrent& t) {
 	string peer_id = "-SA0001-";
 	copy(peer_id.begin(), peer_id.end(), buff.begin()+36);
 	for(int i=0;i+peer_id.size()<20;i++){
-		buff[36+peer_id.size()+i] = rand() % 256;
+		buff[36+peer_id.size()+i] = 'x';
 	}
 
 	// left

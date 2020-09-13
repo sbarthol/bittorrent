@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <string>
 #include <stdexcept>
+#include <ctype.h>
 
 using namespace std;
 
@@ -21,7 +22,7 @@ void http::add_argument(const string& key, const buffer& value) {
 	path.push_back(n_args == 0 ? '?' : '&');
 	append(key, path);
 	path.push_back('=');
-	append(value, path);
+	append(urlencode(value), path);
 
 	n_args++;
 }
@@ -42,6 +43,28 @@ void http::append(const string& s, buffer& b) {
 
 void http::append(const buffer& s, buffer& b) {
 	copy(s.begin(), s.end(), back_inserter(b));
+}
+
+string http::urlencode(const buffer &b) {
+
+    static const char lookup[]= "0123456789abcdef";
+    string ans;
+
+    for(int i=0; i<b.size(); i++) {
+
+        char c = b[i];
+        if (isalnum(c) || c=='-' || c=='_' || c=='.' || c=='~') {
+        	ans.push_back(c);
+
+        }else{
+
+        	ans.push_back('%');
+        	ans.push_back(lookup[(c&0xF0)>>4]);
+        	ans.push_back(lookup[(c&0x0F)]);
+        }
+    }
+
+    return ans;
 }
 
 buffer http::get() {

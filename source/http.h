@@ -19,8 +19,9 @@ private:
 
 public:
 	http(const url_t& url);
-	void add_argument(const std::string& key, const buffer& value);
+	std::string urlencode(const buffer& b);
 	void add_argument(const std::string& key, const std::string& value);
+	void add_argument(const std::string& key, const buffer& value);
 	buffer get();
 };
 

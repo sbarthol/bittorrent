@@ -5,6 +5,7 @@
 #include "buffer.h"
 #include <stdio.h>
 #include <iostream>
+#include "bencode.h"
 
 using namespace std;
 
@@ -12,9 +13,9 @@ TEST(tracker, simple) {
 
     torrent t("../goosebumps.torrent");
     buffer b = tracker::get_peers(t);
+    bencode::item item = bencode::parse(b);
 
-    for(char c:b)cout<<c;
-    cout<<endl;
+    bencode::print(item);
 }
 
 /*
