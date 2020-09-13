@@ -6,7 +6,10 @@
 struct url_t {
 
 	std::string host;
+	std::string path;
 	int port;
+
+	enum {UDP, TCP} protocol;
 
 	url_t(const std::string& url);
 	url_t() {};
