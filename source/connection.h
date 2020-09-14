@@ -5,6 +5,7 @@
 #include "tracker.h"
 #include "buffer.h"
 #include "tcp.h"
+#include <vector>
 
 class connection {
 
@@ -31,9 +32,10 @@ private:
 	peer p;
 	torrent t;
 	bool handshake;
+	std::vector<bool>& requested;
 
 public:
-	connection(const peer& p, const torrent& t);
+	connection(const peer& p, const torrent& t, std::vector<bool>& requested);
 	void download();
 };
 

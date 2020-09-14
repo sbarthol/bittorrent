@@ -7,13 +7,13 @@
 #include "connection.h"
 
 
-
+// Todo enlever
 #include <iostream>
 
 using namespace std;
 
-connection::connection(const peer& p, const torrent& t): 
-	p(p), t(t), buff(buffer()), handshake(true) {}
+connection::connection(const peer& p, const torrent& t, vector<bool>& requested): p(p), t(t), buff(buffer()), 
+	handshake(true), requested(requested) {}
 
 void connection::download() {
 
