@@ -13,6 +13,7 @@ buffer peer_id::get() {
 
 void peer_id::generate(const std::string& pref) {
 
+	srand(time(NULL));
 	id = buffer();
 
 	copy(pref.begin(),pref.end(),back_inserter(id));

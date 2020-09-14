@@ -10,19 +10,35 @@
 
 using namespace std;
 
-TEST(tracker, simple) {
+TEST(tracker, goosebumps) {
 
     peer_id::generate();
 
     torrent t("../goosebumps.torrent");
-    buffer b = tracker::get_peers(t);
-    bencode::item item = bencode::parse(b);
+    vector<peer> v = tracker::get_peers(t);
+    
+    for(peer p:v){
+        cout<<"host: "<<p.host<<endl;
+        cout<<"port: "<<p.port<<endl;
+        cout<<endl;
+    }
+}
 
-    bencode::print(item);
+TEST(tracker, puppy) {
+
+    peer_id::generate();
+
+    torrent t("../puppy.torrent");
+    vector<peer> v = tracker::get_peers(t);
+    
+    for(peer p:v){
+        cout<<"host: "<<p.host<<endl;
+        cout<<"port: "<<p.port<<endl;
+        cout<<endl;
+    }
 }
 
 /*
-
 
 {
     "announce":"http://tracker.yggtracker.cc:8080/IEBVvI0dWAS5pBBKtKDpggBzr00fImwa/announce",
@@ -36,6 +52,5 @@ TEST(tracker, simple) {
             "private":1
             }
 }
-
 
 */

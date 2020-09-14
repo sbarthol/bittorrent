@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include "peer_id.h"
+#include "bencode.h"
 
 using namespace std;
 
@@ -42,6 +43,9 @@ void tracker::build_ann_req_http(http& request, const torrent& t) {
 
 	// downloaded
 	request.add_argument("downloaded", "0");
+
+	// compact
+	request.add_argument("compact", "1");
 
 	// left
 	request.add_argument("left", to_string(t.length));
@@ -95,10 +99,8 @@ buffer tracker::build_ann_req_udp(const buffer& b, const torrent& t) {
 	return buff;
 }
 
-buffer tracker::get_peers(const torrent& t) {
+vector<peer> tracker::get_peers(const torrent& t) {
 
-	srand(time(NULL));
-	
 	if (t.url.protocol == url_t::UDP) {
 
 		udp client(t.url.host, t.url.port);
@@ -106,14 +108,49 @@ buffer tracker::get_peers(const torrent& t) {
 		buffer b = client.receive();
 
 		client.send(build_ann_req_udp(b, t));
-		return client.receive();
+		buffer c = client.receive();
+
+		const int PEER_OFFSET = 20;
+		c.erase(c.begin(), c.begin() + PEER_OFFSET);
+
+		return get_peers(c);
 
 	} else if (t.url.protocol == url_t::HTTP) {
 
 		http request(t.url);
 		build_ann_req_http(request, t);
-		return request.get();
+		buffer encoded = request.get();
+
+		bencode::item item = bencode::parse(encoded);
+		buffer peer_bytes = item.get_buffer("peers");
+		return get_peers(peer_bytes);
 	}
 
 	throw runtime_error("protocol not recognized");
 }
+
+vector<peer> tracker::get_peers(const buffer& b) {
+
+	const int PEER_BYTE_SIZE = 6;
+	buffer::size_type n = b.size();
+
+	if(n % PEER_BYTE_SIZE != 0) throw runtime_error("peer list not a multiple of 6");
+
+	vector<peer> peers;
+	for(auto i = 0; i < n; i+=6) {
+
+		string host = to_string(b[i]);
+		for(int j=1;j<4;j++){
+			host += "." + to_string(b[i+j]);
+		}
+
+		int port = 0;
+		port += b[i+4] * 256;
+		port += b[i+5];
+
+		peers.push_back(peer(host, port));
+	}
+
+	return peers;
+}
+
