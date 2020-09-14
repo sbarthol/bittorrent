@@ -9,7 +9,8 @@ RUN apt-get -y update && \
       g++ \
       man \
       manpages-posix \
-      libssl-dev
+      libssl-dev \
+      build-essential
 
 WORKDIR /app/build
 

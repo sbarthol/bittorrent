@@ -10,12 +10,12 @@ class transport {
 
 private:
 	struct sockaddr_in servaddr; 
-	int fd;
-	static const int MAXLINE = 1024;
+	static const int MAXLINE = 1500;
 	char buff[MAXLINE];
 
 protected:
 	transport(std::string address, int port, int type);
+	int fd;
 
 public:
 	void send(buffer message);

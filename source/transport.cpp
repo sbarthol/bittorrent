@@ -1,5 +1,4 @@
 #include "transport.h"
-#include <sys/socket.h>
 #include <stdio.h>
 #include <stdexcept>
 #include <sys/socket.h>
