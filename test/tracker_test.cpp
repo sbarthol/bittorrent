@@ -6,10 +6,13 @@
 #include <stdio.h>
 #include <iostream>
 #include "bencode.h"
+#include "peer_id.h"
 
 using namespace std;
 
 TEST(tracker, simple) {
+
+    peer_id::generate();
 
     torrent t("../goosebumps.torrent");
     buffer b = tracker::get_peers(t);

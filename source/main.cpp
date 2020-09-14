@@ -1,9 +1,12 @@
 #include "torrent.h"
 #include <iostream>
+#include "peer_id.h"
 
 using namespace std;
 
 int main() {
+
+
 
 	torrent t("../goosebumps.torrent");
 	cout<<t.url.host<<endl;

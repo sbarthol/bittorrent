@@ -38,7 +38,7 @@ buffer torrent::get_hash_info(const bencode::item& item) {
 	bencode::item info = item.get_item("info");
 	buffer encoded = bencode::encode(info);
 
-	#define SIZE_SHA1 20
+	const int SIZE_SHA1 = 20;
 
 	unsigned char buff[SIZE_SHA1];
 	SHA1(encoded.data(), encoded.size(), buff);

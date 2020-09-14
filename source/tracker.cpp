@@ -6,13 +6,14 @@
 #include "url.h"
 #include <algorithm>
 #include <stdexcept>
+#include "peer_id.h"
 
 using namespace std;
 
-buffer tracker::build_conn_req() {
+buffer tracker::build_conn_req_udp() {
 
-	#define SIZE_CONN 16
-	#define RANDOM_SIZE 4
+	const int SIZE_CONN = 16;
+	const int RANDOM_SIZE = 4;
 
 	unsigned char msg[SIZE_CONN] = {0x00, 0x00, 0x04, 0x17,
 							0x27, 0x10, 0x19, 0x80,
@@ -31,14 +32,7 @@ void tracker::build_ann_req_http(http& request, const torrent& t) {
 	request.add_argument("info_hash", t.info_hash);
 
 	//peer_id
-	// Todo: id stays the same until app closes
-	string peer_id = "-SA0001-";
-	int peer_id_size = peer_id.size();
-
-	for(int i=0;i+peer_id_size<20;i++){
-		peer_id.push_back('x');
-	}
-	request.add_argument("peer_id", peer_id);
+	request.add_argument("peer_id", peer_id::get());
 
 	// port
 	request.add_argument("port", "6881");
@@ -53,9 +47,9 @@ void tracker::build_ann_req_http(http& request, const torrent& t) {
 	request.add_argument("left", to_string(t.length));
 }
 
-buffer tracker::build_ann_req(const buffer& b, const torrent& t) {
+buffer tracker::build_ann_req_udp(const buffer& b, const torrent& t) {
 
-	#define SIZE_ANN 98
+	const int SIZE_ANN = 98;
 
 	buffer buff(SIZE_ANN, 0x00);
 
@@ -72,12 +66,8 @@ buffer tracker::build_ann_req(const buffer& b, const torrent& t) {
 	copy(t.info_hash.begin(), t.info_hash.end(), buff.begin()+16);
 
 	// peer id
-	// Todo: id stays the same until app closes
-	string peer_id = "-SA0001-";
-	copy(peer_id.begin(), peer_id.end(), buff.begin()+36);
-	for(int i=0;i+peer_id.size()<20;i++){
-		buff[36+peer_id.size()+i] = 'x';
-	}
+	buffer id = peer_id::get();
+	copy(id.begin(), id.end(), buff.begin()+36);
 
 	// left
 	long long x = t.length;
@@ -112,10 +102,10 @@ buffer tracker::get_peers(const torrent& t) {
 	if (t.url.protocol == url_t::UDP) {
 
 		udp client(t.url.host, t.url.port);
-		client.send(build_conn_req());
+		client.send(build_conn_req_udp());
 		buffer b = client.receive();
 
-		client.send(build_ann_req(b, t));
+		client.send(build_ann_req_udp(b, t));
 		return client.receive();
 
 	} else if (t.url.protocol == url_t::HTTP) {

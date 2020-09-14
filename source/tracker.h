@@ -11,8 +11,8 @@
 class tracker {
 
 private:
-	static buffer build_conn_req();
-	static buffer build_ann_req(const buffer& b, const torrent& t);
+	static buffer build_conn_req_udp();
+	static buffer build_ann_req_udp(const buffer& b, const torrent& t);
 	static void build_ann_req_http(http& request, const torrent& t);
 
 public:
