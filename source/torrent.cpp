@@ -14,6 +14,7 @@ torrent::torrent(const string& filename) {
 	this->url = item.get_string("announce");
 	this->info_hash = get_hash_info(item);
 	this->length = get_length(item);
+	this->dic = move(item);
 }
 
 buffer torrent::get_bytes(const string& filename) {

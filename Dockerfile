@@ -15,4 +15,4 @@ RUN apt-get -y update && \
 WORKDIR /app/build
 
 # docker build -t bit_torrent .
-# docker run -it -v /Users/sacha/Desktop/Projects/cmake:/app bit_torrent
+# docker run -it -v /Users/sacha/Desktop/Projects/BitTorrent:/app bit_torrent

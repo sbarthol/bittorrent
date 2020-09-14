@@ -28,6 +28,7 @@ struct peer {
 	int port;
 
 	peer(std::string host, int port): host(host), port(port) {};
+	void download();
 };
 
 #endif // TRACKER_H

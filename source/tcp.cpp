@@ -10,4 +10,10 @@ void tcp::close() {
 		std::string what = strerror(errno);
 		throw std::runtime_error(what);
 	}
+	closed_flag = true;
+}
+
+bool tcp::closed() {
+
+	return closed_flag;
 }

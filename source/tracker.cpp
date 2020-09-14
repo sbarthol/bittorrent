@@ -144,9 +144,7 @@ vector<peer> tracker::get_peers(const buffer& b) {
 			host += "." + to_string(b[i+j]);
 		}
 
-		int port = 0;
-		port += b[i+4] * 256;
-		port += b[i+5];
+		int port = getBE16(b,i+4);
 
 		peers.push_back(peer(host, port));
 	}
