@@ -18,6 +18,9 @@ TEST(connection, goosebumps) {
 
     torrent t("../goosebumps.torrent");
     vector<peer> v = tracker::get_peers(t);
+
+    cout<<"received "<<v.size()<<" peers"<<endl;
+
     download d(v,t);
     d.start();
 }

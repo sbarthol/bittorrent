@@ -12,7 +12,9 @@ public:
 	buffer info_hash;
 	long long length;
 	url_t url;
-	bencode::item dic;
+
+	long long piece_length;
+	long long pieces;
 
 	torrent(const std::string& filename);
 

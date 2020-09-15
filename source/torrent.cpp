@@ -14,7 +14,11 @@ torrent::torrent(const string& filename) {
 	this->url = item.get_string("announce");
 	this->info_hash = get_hash_info(item);
 	this->length = get_length(item);
-	this->dic = move(item);
+
+	bencode::item info = item.get_item("info");
+
+	this->piece_length = info.get_int("piece length");
+	this->pieces = (this->length + this->piece_length - 1) / this->piece_length;
 }
 
 buffer torrent::get_bytes(const string& filename) {

@@ -28,6 +28,12 @@ private:
 				unsigned int begin, unsigned int length);
 	buffer build_port(unsigned int port);
 
+	void choke_handler();
+	void unchoke_handler();
+	void have_handler(buffer& b, tcp& socket);
+	void bitfield_handler(buffer& b, tcp& socket);
+	void piece_handler();
+
 	buffer buff;
 	peer p;
 	torrent t;
