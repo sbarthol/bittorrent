@@ -6,8 +6,8 @@ set(SOURCES ${SOURCES})
 
 add_executable(${BINARY}_run ${SOURCES})
 
-target_link_libraries(${BINARY}_run -lcrypto)
+target_link_libraries(${BINARY}_run -lcrypto -lpthread)
 
 add_library(${BINARY}_lib STATIC ${SOURCES})
 
-target_link_libraries(${BINARY}_lib -lcrypto)
+target_link_libraries(${BINARY}_lib -lcrypto -lpthread)
