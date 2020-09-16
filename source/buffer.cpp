@@ -48,7 +48,7 @@ void print(const buffer& b) {
 		if(32<=c&&c<128){
 			cout<<c;
 		}else{
-			cout<<"0x"<<hex<<(unsigned int)c<<" ";
+			cout<<"0x"<<hex<<(unsigned int)c<<" "<<dec;
 		}
 	}
 	cout<<endl;

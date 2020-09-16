@@ -5,7 +5,7 @@ class download {
 private:
 	std::vector<bool> requested;
 	const std::vector<peer>& peers;
-	const torrent t;
+	const torrent& t;
 
 public:
 	download(const std::vector<peer>& peers, const torrent& t);

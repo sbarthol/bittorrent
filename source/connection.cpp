@@ -96,27 +96,24 @@ void connection::have_handler(buffer& b, tcp& socket) {
 
 void connection::bitfield_handler(buffer& b, tcp& socket) {
 
-	cout<<"aaa"<<endl;
 	unsigned int n_bytes = getBE32(b,0) - 1;
-	cout<<"bbb"<<endl;
 	if(n_bytes != (t.pieces + 7) / 8) 
 		throw runtime_error("bitfield has wrong number of bytes");
-	cout<<"ccc"<<endl;
+	
 	for(long long piece = 0; piece < t.pieces; piece++) {
-		cout<<"ddd"<<endl;
+		
 		if(b[5+(piece>>3)]&(1<<(7-(piece%8)))) {
-			cout<<"eee"<<endl;
+			
 			if(!requested[piece]) {
-				cout<<"fff"<<endl;
+				
 				// Todo what to write here
 				cout<<"pieces = "<<t.pieces<<endl;
 				cout<<"req size = "<<requested.size()<<endl;
 				cout<<"piece = "<<piece<<endl;
 				socket.send(build_request(piece, 0, 1));
-				cout<<"fgfgfgf"<<endl;
+				
+				// Todo make thread safe
 				requested[piece] = true;
-
-				cout<<"ggg"<<endl;
 			}
 		}
 	}
@@ -213,25 +210,30 @@ buffer connection::build_bitfield(const buffer& bitfield) {
 buffer connection::build_request(unsigned int index, 
 				unsigned int begin, unsigned int length) {
 
-	cout<<"1"<<endl;
-
 	buffer b(17);
-	cout<<"2"<<endl;
+	
 	b[3]=13;
-	cout<<"3"<<endl;
 	b[4]=6;
-	cout<<"4"<<endl;
 
-	setBE32(index, b, 5);
+	for(int i=0;i<4;i++) {
 
-	cout<<"5"<<endl;
-	setBE32(begin, b, 9);
-	cout<<"6"<<endl;
-	setBE32(length, b, 13);
-	cout<<"7"<<endl;
+		b[5+3-i] = index % 256;
+		index /= 256;
+	}
+
+	for(int i=0;i<4;i++) {
+
+		b[9+3-i] = begin % 256;
+		begin /= 256;
+	}
+
+	for(int i=0;i<4;i++) {
+
+		b[13+3-i] = length % 256;
+		length /= 256;
+	}
 
 	print(b);
-
 	return b;
 }
 

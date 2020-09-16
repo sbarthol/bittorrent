@@ -35,8 +35,8 @@ private:
 	void piece_handler();
 
 	buffer buff;
-	peer p;
-	torrent t;
+	const peer& p;
+	const torrent& t;
 	bool handshake;
 	std::vector<bool>& requested;
 
