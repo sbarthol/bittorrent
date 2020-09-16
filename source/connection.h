@@ -6,6 +6,7 @@
 #include "buffer.h"
 #include "tcp.h"
 #include <vector>
+#include <queue>
 
 class connection {
 
@@ -32,12 +33,15 @@ private:
 	void unchoke_handler();
 	void have_handler(buffer& b, tcp& socket);
 	void bitfield_handler(buffer& b, tcp& socket);
-	void piece_handler();
+	void piece_handler(tcp& socket);
+
+	void request_piece(tcp& socket);
 
 	buffer buff;
 	const peer& p;
 	const torrent& t;
 	bool handshake;
+	std::queue<long long>q;
 	std::vector<bool>& requested;
 
 public:

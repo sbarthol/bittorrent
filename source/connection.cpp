@@ -63,7 +63,7 @@ void connection::download() {
 						bitfield_handler(b,socket);
 						break;
 					case 7:
-						piece_handler();
+						piece_handler(socket);
 						break;
 					default:
 						break;
@@ -86,11 +86,10 @@ void connection::unchoke_handler() {
 void connection::have_handler(buffer& b, tcp& socket) {
 
 	unsigned int piece = getBE32(b,5);
-	if(!requested[piece]) {
+	q.push(piece);
 
-		// Todo what to write here
-		socket.send(build_request(piece, 0, 1));
-		requested[piece] = true;
+	if(q.size() == 1) {
+		request_piece(socket);
 	}
 }
 
@@ -103,25 +102,31 @@ void connection::bitfield_handler(buffer& b, tcp& socket) {
 	for(long long piece = 0; piece < t.pieces; piece++) {
 		
 		if(b[5+(piece>>3)]&(1<<(7-(piece%8)))) {
-			
-			if(!requested[piece]) {
-				
-				// Todo what to write here
-				cout<<"pieces = "<<t.pieces<<endl;
-				cout<<"req size = "<<requested.size()<<endl;
-				cout<<"piece = "<<piece<<endl;
-				socket.send(build_request(piece, 0, 1));
-				
-				// Todo make thread safe
-				requested[piece] = true;
-			}
+			q.push(piece);
 		}
+	}
+
+	if(q.size() == 1) {
+		request_piece(socket);
 	}
 }
 
-void connection::piece_handler() {
+void connection::request_piece(tcp& socket) {
 
-	
+	// Todo make this thread safe
+
+	long long piece = q.front();
+	if(requested[piece]) {
+		q.pop();
+	}else{
+		socket.send(build_request(piece, 0, 1));
+	}
+}
+
+void connection::piece_handler(tcp& socket) {
+
+	q.pop();
+	request_piece(socket);
 }
 
 buffer connection::build_handshake(const torrent& t) {
