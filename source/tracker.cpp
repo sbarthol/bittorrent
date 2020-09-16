@@ -121,6 +121,10 @@ vector<peer> tracker::get_peers(const torrent& t) {
 		build_ann_req_http(request, t);
 		buffer encoded = request.get();
 
+		if(encoded.size() == 0) {
+			throw runtime_error("tracker responded with 0 bytes");
+		}
+
 		bencode::item item = bencode::parse(encoded);
 		buffer peer_bytes = item.get_buffer("peers");
 		return get_peers(peer_bytes);
