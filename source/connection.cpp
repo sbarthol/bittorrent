@@ -98,18 +98,24 @@ void connection::have_handler(buffer& b) {
 
 void connection::bitfield_handler(buffer& b) {
 
+	bool empty = q.empty();
+
 	unsigned int n_bytes = getBE32(b,0) - 1;
 	if(n_bytes != (t.pieces + 7) / 8) 
 		throw runtime_error("bitfield has wrong number of bytes");
 	
-	for(long long piece = 0; piece < t.pieces; piece++) {
-		
-		if(b[5+(piece>>3)]&(1<<(7-(piece%8)))) {
-			enqueue(piece);
+	for(int i=0;i<t.pieces;i++) {
+
+		unsigned char byte = b[5+i];
+
+		for(int j=0;j<8;j++) {
+			if(byte & (1<<(7-j))) {
+				enqueue(i*8 + j);
+			}
 		}
 	}
 
-	if(q.size() == 1) {
+	if(empty) {
 		request_piece();
 	}
 }
