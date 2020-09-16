@@ -21,7 +21,7 @@ void connection::download() {
 	socket.send(build_handshake(t));
 
 	cout<<"handshake sent:"<<endl;
-	build_handshake(t).print();
+	print(build_handshake(t));
 
 	buffer b;
 
@@ -33,7 +33,7 @@ void connection::download() {
 
 			// ignore b
 			cout<<"handshake received:"<<endl;
-			b.print();
+			print(b);
 
 			socket.send(build_interested());
 			handshake = false;
@@ -41,7 +41,7 @@ void connection::download() {
 		} else {
 
 			cout<<"something received:"<<endl;
-			b.print();
+			print(b);
 
 			if(b.size() < 4) {
 				throw runtime_error("message size less than 4");
@@ -85,7 +85,7 @@ void connection::unchoke_handler() {
 
 void connection::have_handler(buffer& b, tcp& socket) {
 
-	unsigned int piece = b.getBE32(5);
+	unsigned int piece = getBE32(b,5);
 	if(!requested[piece]) {
 
 		// Todo what to write here
@@ -97,7 +97,7 @@ void connection::have_handler(buffer& b, tcp& socket) {
 void connection::bitfield_handler(buffer& b, tcp& socket) {
 
 	cout<<"aaa"<<endl;
-	unsigned int n_bytes = b.getBE32(0) - 1;
+	unsigned int n_bytes = getBE32(b,0) - 1;
 	cout<<"bbb"<<endl;
 	if(n_bytes != (t.pieces + 7) / 8) 
 		throw runtime_error("bitfield has wrong number of bytes");
@@ -203,7 +203,7 @@ buffer connection::build_have(const buffer& payload) {
 buffer connection::build_bitfield(const buffer& bitfield) {
 
 	buffer b(5+bitfield.size());
-	b.setBE32(1+bitfield.size(), 0);
+	setBE32(1+bitfield.size(), b, 0);
 	b[4]=5;
 	copy(bitfield.begin(), bitfield.end(), b.begin()+5);
 
@@ -222,15 +222,15 @@ buffer connection::build_request(unsigned int index,
 	b[4]=6;
 	cout<<"4"<<endl;
 
-	b.setBE32(index, 5);
+	setBE32(index, b, 5);
 
 	cout<<"5"<<endl;
-	b.setBE32(begin, 9);
+	setBE32(begin, b, 9);
 	cout<<"6"<<endl;
-	b.setBE32(length, 13);
+	setBE32(length, b, 13);
 	cout<<"7"<<endl;
 
-	b.print();
+	print(b);
 
 	return b;
 }
@@ -239,11 +239,11 @@ buffer connection::build_piece(unsigned int index,
 				unsigned int begin, const buffer& block) {
 
 	buffer b(13 + block.size());
-	b.setBE32(9 + block.size(), 0);
+	setBE32(9 + block.size(), b, 0);
 	b[4]=7;
 
-	b.setBE32(index, 5);
-	b.setBE32(begin, 9);
+	setBE32(index, b, 5);
+	setBE32(begin, b, 9);
 	copy(block.begin(), block.end(), b.begin() + 13);
 
 	return b;
@@ -256,9 +256,9 @@ buffer connection::build_cancel(unsigned int index,
 	b[3]=13;
 	b[4]=8;
 
-	b.setBE32(index, 5);
-	b.setBE32(begin, 9);
-	b.setBE32(length, 13);
+	setBE32(index, b, 5);
+	setBE32(begin, b, 9);
+	setBE32(length, b, 13);
 
 	return b;
 }
@@ -269,7 +269,7 @@ buffer connection::build_port(unsigned int port) {
 	b[3]=3;
 	b[4]=9;
 
-	b.setBE16(port, 5);
+	setBE16(port, b, 5);
 
 	return b;
 }
@@ -277,7 +277,7 @@ buffer connection::build_port(unsigned int port) {
 buffer connection::get_message(tcp& client) {
 
 	auto length = [this](){
-		return handshake ? buff[0] + 49 : buff.getBE32(0) + 4;
+		return handshake ? buff[0] + 49 : getBE32(buff,0) + 4;
 	};
 
 	while(buff.size() < 4 || buff.size() < length()) {
