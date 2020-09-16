@@ -1,22 +1,37 @@
 #include "download.h"
-
+#include <thread>
 #include <iostream>
 
 using namespace std;
 
-download::download(const std::vector<peer>& peers, const torrent& t): t(t), peers(peers) {
+download::download(const vector<peer>& peers, const torrent& t): 
+														t(t), peers(peers) {
 
-	bencode::item info = t.dic.get_item("info");
-	long long length = info.get_int("length");
-	long long piece_length = info.get_int("piece length");
-
-	long long pieces = (length + piece_length - 1) / piece_length;
-	cout<<"there are "<<pieces<<" pieces"<<endl;
-	requested = vector<bool>(pieces);
+	requested = vector<bool>(t.pieces);
 }
 
 void download::start() {
 
-	connection conn(peers[0], t, requested);
-	conn.download();
+	if(peers.size() == 0) throw runtime_error("no peers");
+
+	vector<thread> threads(5);
+	for(int i=0;i<threads.size();i++) {
+
+		threads[i] = thread([this,i](){
+
+			connection conn(peers[i], t, requested);
+			try {
+				conn.download();
+			} catch (exception& e) {
+				cout<<"thread threw: "<<e.what()<<endl;
+			}
+		});
+	}
+
+	for(thread& t:threads) {
+
+		t.join();
+	}
+
+	
 }
