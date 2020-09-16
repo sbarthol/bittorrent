@@ -1,12 +1,30 @@
 # BitTorrent
 
-BitTorrent is a small torrenting client written in C++.
+BitTorrent is a small torrenting client written from scratch in C++. The only external library used is OpenSSL for computing SHA1 hashes. Tested only on Ubuntu 18.04 plateform (Dockerfile provided).
 
 ## How does it work
 
+torrent format
+bencode
+tracker (udp, http)
+downloading
+messages
+
 ## Build
 
-Simply run
+Run the following commands:
+
+```
+mkdir build
+cd build
+cmake ..
+make
+./source/BitTorrent_run <torrent_file>
+```
+
+## Testing
+
+Run the following commands:
 
 ```
 git clone https://github.com/google/googletest.git
@@ -15,15 +33,6 @@ cd build
 cmake ..
 make
 ```
-Debug mode:
-
-```
-cmake -DCMAKE_BUILD_TYPE=Debug ..
-make
-```
-Debug build enables [AddressSanitizer](https://github.com/google/sanitizers), which can generate false positives for overflow on STL containers. If you encounter this, define the environment variable `ASAN_OPTIONS=detect_container_overflow=0`.
-
-## Testing
 
 After having built the project, the test binaries are located
 in build/test/

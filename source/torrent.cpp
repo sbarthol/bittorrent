@@ -18,7 +18,11 @@ torrent::torrent(const string& filename) {
 	bencode::item info = item.get_item("info");
 
 	this->piece_length = info.get_int("piece length");
-	this->pieces = (this->length + this->piece_length - 1) / this->piece_length;
+
+	buffer hashes = info.get_buffer("pieces");
+
+	const int SHA1_SIZE = 20;
+	this->pieces = hashes.size() / SHA1_SIZE;
 }
 
 buffer torrent::get_bytes(const string& filename) {
@@ -70,3 +74,26 @@ long long torrent::get_length(const bencode::item& item) {
 
 	return length;
 }
+
+int torrent::get_piece_length(int piece) {
+
+	return piece == pieces - 1 ? 
+		(length % piece_length == 0 ? piece_length : length % piece_length) : 
+		piece_length;
+}
+
+int torrent::get_n_blocks(int piece) {
+
+	return (get_piece_length(piece) + BLOCK_SIZE - 1) / BLOCK_SIZE;
+}
+
+int torrent::get_block_length(int piece, int block_index) {
+
+	return block_index == get_n_blocks(piece) - 1 ? 
+			(get_piece_length(piece) % BLOCK_SIZE == 0 ? 
+					BLOCK_SIZE : 
+					get_piece_length(piece) % BLOCK_SIZE) : 
+			BLOCK_SIZE;
+}
+
+

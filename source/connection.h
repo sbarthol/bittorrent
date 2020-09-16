@@ -7,46 +7,46 @@
 #include "tcp.h"
 #include <vector>
 #include <queue>
+#include "download.h"
 
 class connection {
 
 private:
 	buffer get_message(tcp& client);
 
-	buffer build_handshake(const torrent& t);
-	buffer build_keep_alive();
-	buffer build_choke();
-	buffer build_unchoke();
-	buffer build_interested();
-	buffer build_not_interested();
-	buffer build_have(const buffer& payload);
-	buffer build_bitfield(const buffer& bitfield);
-	buffer build_request(unsigned int index, 
-				unsigned int begin, unsigned int length);
-	buffer build_piece(unsigned int index, 
-				unsigned int begin, const buffer& block);
-	buffer build_cancel(unsigned int index, 
-				unsigned int begin, unsigned int length);
-	buffer build_port(unsigned int port);
-
 	void choke_handler();
 	void unchoke_handler();
-	void have_handler(buffer& b, tcp& socket);
-	void bitfield_handler(buffer& b, tcp& socket);
-	void piece_handler(tcp& socket);
+	void have_handler(buffer& b);
+	void bitfield_handler(buffer& b);
+	void piece_handler();
 
-	void request_piece(tcp& socket);
+	void request_piece();
+
+	void enqueue(int piece);
+
+	const int BLOCK_SIZE = (1<<14);
 
 	buffer buff;
 	const peer& p;
-	const torrent& t;
+	torrent& t;
+	bool choked;
 	bool handshake;
-	std::queue<long long>q;
-	std::vector<bool>& requested;
+	download& d;
+	tcp socket;
+
+	struct job {
+		int index;
+		int begin;
+		int length;
+
+		job(int i, int b, int l): index(i), begin(b), length(l) {}
+	};
+
+	std::queue<job>q;
 
 public:
-	connection(const peer& p, const torrent& t, std::vector<bool>& requested);
-	void download();
+	connection(const peer& p, torrent& t, download& d);
+	void start_download();
 };
 
 #endif // CONNECTION_H
