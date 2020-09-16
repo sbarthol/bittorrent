@@ -64,7 +64,7 @@ void connection::start_download() {
 						bitfield_handler(b);
 						break;
 					case 7:
-						piece_handler();
+						piece_handler(b);
 						break;
 					default:
 						break;
@@ -77,7 +77,6 @@ void connection::start_download() {
 void connection::choke_handler() {
 
 	socket.close();
-	throw runtime_error("choked message received");
 }
 
 void connection::unchoke_handler() {
@@ -139,10 +138,17 @@ void connection::request_piece() {
 	}
 }
 
-void connection::piece_handler() {
+void connection::piece_handler(buffer& b) {
 
-	q.pop();
-	request_piece();
+	unsigned int index = getBE32(b, 5);
+	unsigned int begin = getBE32(b, 9);
+
+	d.add_received(index, begin);
+	if(d.is_done()) {
+		socket.close();
+	}else{
+		request_piece();
+	}
 }
 
 buffer connection::get_message(tcp& client) {

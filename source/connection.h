@@ -18,7 +18,7 @@ private:
 	void unchoke_handler();
 	void have_handler(buffer& b);
 	void bitfield_handler(buffer& b);
-	void piece_handler();
+	void piece_handler(buffer& b);
 
 	void request_piece();
 

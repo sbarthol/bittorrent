@@ -27,8 +27,8 @@ void download::start() {
 
 		threads[i] = thread([this,i](){
 
-			connection conn(peers[i], t, *this);
 			try {
+				connection conn(peers[i], t, *this);
 				conn.start_download();
 			} catch (exception& e) {
 				cout<<"thread threw: "<<e.what()<<endl;
@@ -55,8 +55,6 @@ void download::add_received(int piece, int block) {
 }
 
 bool download::is_needed(int piece, int block) {
-
-	if(is_done()) return false;
 
 	scoped_lock sl(received_mutex, requested_mutex);
 
