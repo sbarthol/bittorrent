@@ -25,7 +25,7 @@ private:
 
 	void enqueue(int piece);
 
-	const int BLOCK_SIZE = (1<<14);
+	static const int BLOCK_SIZE = (1<<14);
 
 	buffer buff;
 	const peer& p;

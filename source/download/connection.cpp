@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include "download/connection.h"
 #include "download/message.h"
+#include <cassert>
 
 
 // Todo enlever
@@ -88,6 +89,9 @@ void connection::unchoke_handler() {
 void connection::have_handler(buffer& b) {
 
 	unsigned int piece = getBE32(b,5);
+	if(piece >= t.pieces) 
+		throw runtime_error("have message contains invalid piece");
+
 	cout<<"tid "<< this_thread::get_id() <<":\t have received, piece = "<<piece<<endl;
 	enqueue(piece);
 
@@ -105,7 +109,7 @@ void connection::bitfield_handler(buffer& b) {
 	if(n_bytes != (t.pieces + 7) / 8) 
 		throw runtime_error("bitfield has wrong number of bytes");
 	
-	for(int i=0;i<t.pieces;i++) {
+	for(int i=0;i<n_bytes;i++) {
 
 		unsigned char byte = b[5+i];
 
@@ -134,9 +138,12 @@ void connection::request_piece() {
 
 		unique_lock<mutex> lock(m);
 
-		if(d.is_needed(j.index, j.begin)) {
+		assert(j.begin % BLOCK_SIZE == 0);
 
-			d.add_requested(j.index, j.begin);
+		if(d.is_needed(j.index, j.begin / BLOCK_SIZE)) {
+
+			assert(j.begin % BLOCK_SIZE == 0);
+			d.add_requested(j.index, j.begin / BLOCK_SIZE);
 			lock.unlock();
 
 			socket.send(message::build_request(j.index, j.begin, j.length));
@@ -158,12 +165,18 @@ void connection::piece_handler(buffer& b) {
 	cout<<"tid "<< this_thread::get_id() <<":\t piece received, piece = "<<index<<", block = "<<begin<<", completed = "<<100.0*d.completed()<<endl;
 
 	b.erase(b.begin(), b.begin() + 9);
+
+	assert(begin % BLOCK_SIZE == 0);
 	d.write_to_file(index, begin, b);
 
 	unique_lock<mutex> lock(m);
 
-	d.add_received(index, begin);
+	assert(begin % BLOCK_SIZE == 0);
+
+	d.add_received(index, begin / BLOCK_SIZE);
 	if(d.is_done()) {
+
+		cout<<"Download complete!"<<endl;
 		lock.unlock();
 		socket.close();
 	}else{
@@ -192,8 +205,11 @@ buffer connection::get_message(tcp& client) {
 
 void connection::enqueue(int piece) {
 
+	assert(piece < t.pieces);
+
 	int n_blocks = t.get_n_blocks(piece);
 	for(int i=0;i<n_blocks;i++) {
+		cout<<"added to queue: piece: "<<piece<<", block: "<<i*t.BLOCK_SIZE<<endl;
 		q.push(job(piece, i*t.BLOCK_SIZE, t.get_block_length(piece, i)));
 	}
 }

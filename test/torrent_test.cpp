@@ -12,7 +12,7 @@
 
 TEST(torrent, load) {
 
-	torrent t("../goosebumps.torrent");
+	torrent t("../sample/goosebumps.torrent");
 
 	// 4201 pieces
 	EXPECT_EQ(t.get_piece_length(0), 524288);

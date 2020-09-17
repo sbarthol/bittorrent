@@ -4,6 +4,7 @@
 #include "parsing/buffer.h"
 #include "tracker/url.h"
 #include "parsing/bencode.h"
+#include <string>
 
 class torrent {	
 
@@ -12,20 +13,22 @@ public:
 	buffer info_hash;
 	long long length;
 	url_t url;
+	std::string name;
 
-	int pieces;
+	unsigned int piece_length;
+	unsigned int pieces;
 
 	torrent(const std::string& filename);
 
-	int get_piece_length(int piece);
-	int get_n_blocks(int piece);
-	int get_block_length(int piece, int block_index);
+	unsigned int get_piece_length(unsigned int piece);
+	unsigned int get_n_blocks(unsigned int piece);
+	unsigned int get_block_length(unsigned int piece, unsigned int block_index);
 
-	static const int BLOCK_SIZE = (1<<14);
+	static const unsigned int BLOCK_SIZE = (1<<14);
 
 private:
 
-	int piece_length;
+	
 
 	buffer get_bytes(const std::string& filename);
 	buffer get_hash_info(const bencode::item& item);

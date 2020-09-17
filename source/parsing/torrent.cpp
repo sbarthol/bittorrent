@@ -23,6 +23,9 @@ torrent::torrent(const string& filename) {
 
 	const int SHA1_SIZE = 20;
 	this->pieces = hashes.size() / SHA1_SIZE;
+
+	buffer name_bytes = info.get_buffer("name");
+	this->name = string(name_bytes.begin(), name_bytes.end());
 }
 
 buffer torrent::get_bytes(const string& filename) {
@@ -31,6 +34,10 @@ buffer torrent::get_bytes(const string& filename) {
 	buffer bytes;
 
 	is.open(filename, ios::binary);
+	if(is.fail()) {
+		throw runtime_error("Opening file failed");
+	}
+
 	is.seekg(0, ios::end);
 	size_t filesize=is.tellg();
 	is.seekg(0, ios::beg);
@@ -75,19 +82,19 @@ long long torrent::get_length(const bencode::item& item) {
 	return length;
 }
 
-int torrent::get_piece_length(int piece) {
+unsigned int torrent::get_piece_length(unsigned int piece) {
 
 	return piece == pieces - 1 ? 
 		(length % piece_length == 0 ? piece_length : length % piece_length) : 
 		piece_length;
 }
 
-int torrent::get_n_blocks(int piece) {
+unsigned int torrent::get_n_blocks(unsigned int piece) {
 
 	return (get_piece_length(piece) + BLOCK_SIZE - 1) / BLOCK_SIZE;
 }
 
-int torrent::get_block_length(int piece, int block_index) {
+unsigned int torrent::get_block_length(unsigned int piece, unsigned int block_index) {
 
 	return block_index == get_n_blocks(piece) - 1 ? 
 			(get_piece_length(piece) % BLOCK_SIZE == 0 ? 

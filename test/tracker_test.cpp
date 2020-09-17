@@ -14,7 +14,7 @@ TEST(tracker, goosebumps) {
 
     peer_id::generate();
 
-    torrent t("../goosebumps.torrent");
+    torrent t("../sample/goosebumps.torrent");
     vector<peer> v = tracker::get_peers(t);
     
     for(peer p:v){
@@ -28,7 +28,7 @@ TEST(tracker, puppy) {
 
     peer_id::generate();
 
-    torrent t("../puppy.torrent");
+    torrent t("../sample/puppy.torrent");
     vector<peer> v = tracker::get_peers(t);
     
     for(peer p:v){

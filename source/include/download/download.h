@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "tracker/tracker.h"
+#include <fstream>
 
 class download {
 
@@ -16,6 +17,8 @@ private:
 	int requested_count;
 	int total_blocks;
 
+	std::ofstream out;
+
 public:
 	download(const std::vector<peer>& peers, torrent& t);
 	void add_requested(int piece, int block);
@@ -23,7 +26,7 @@ public:
 	bool is_needed(int piece, int block);
 	bool is_done();
 	void start();
-	void write_to_file(int index, int begin, buffer& piece);
+	void write_to_file(int piece, int offset, buffer& piece_data);
 	double completed();
 };
 

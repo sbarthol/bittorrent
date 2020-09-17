@@ -13,14 +13,13 @@
 
 using namespace std;
 
-TEST(connection, goosebumps) {
+TEST(connection, small) {
 
     srand(time(NULL));
     peer_id::generate();
     // randomize()
 
-    torrent t("../goosebumps.torrent");
-    EXPECT_EQ(t.pieces, 4201);
+    torrent t("../sample/small_file.torrent");
 
     vector<peer> v = tracker::get_peers(t);
 
