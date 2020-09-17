@@ -2,7 +2,7 @@
 #define DOWNLOAD_H
 
 #include <vector>
-#include "tracker.h"
+#include "tracker/tracker.h"
 
 class download {
 

@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "bencode.h"
+#include "parsing/bencode.h"
 #include <vector>
 #include <string>
 #include <iostream>

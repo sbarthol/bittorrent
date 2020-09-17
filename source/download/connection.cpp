@@ -1,11 +1,11 @@
-#include "tracker.h"
-#include "tcp.h"
-#include "buffer.h"
+#include "tracker/tracker.h"
+#include "tracker/tcp.h"
+#include "parsing/buffer.h"
 #include <algorithm>
-#include "peer_id.h"
+#include "download/peer_id.h"
 #include <stdexcept>
-#include "connection.h"
-#include "message.h"
+#include "download/connection.h"
+#include "download/message.h"
 
 
 // Todo enlever

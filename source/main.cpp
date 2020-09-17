@@ -1,6 +1,6 @@
-#include "torrent.h"
+#include "parsing/torrent.h"
 #include <iostream>
-#include "peer_id.h"
+#include "download/peer_id.h"
 
 using namespace std;
 

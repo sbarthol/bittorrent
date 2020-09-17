@@ -1,14 +1,14 @@
-#include "tracker.h"
+#include "tracker/tracker.h"
 #include "gtest/gtest.h"
 #include <vector>
-#include "torrent.h"
-#include "buffer.h"
+#include "parsing/torrent.h"
+#include "parsing/buffer.h"
 #include <stdio.h>
 #include <iostream>
-#include "bencode.h"
-#include "peer_id.h"
-#include "connection.h"
-#include "download.h"
+#include "parsing/bencode.h"
+#include "download/peer_id.h"
+#include "download/connection.h"
+#include "download/download.h"
 
 TEST(torrent, load) {
 

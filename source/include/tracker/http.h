@@ -1,9 +1,9 @@
 #ifndef HTTP_H
 #define HTTP_H
 
-#include "buffer.h"
-#include "tcp.h"
-#include "url.h"
+#include "parsing/buffer.h"
+#include "tracker/tcp.h"
+#include "tracker/url.h"
 #include <string>
 
 class http {

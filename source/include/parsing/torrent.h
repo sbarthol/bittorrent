@@ -1,9 +1,9 @@
 #ifndef TORRENT_H
 #define TORRENT_H
 
-#include "buffer.h"
-#include "url.h"
-#include "bencode.h"
+#include "parsing/buffer.h"
+#include "tracker/url.h"
+#include "parsing/bencode.h"
 
 class torrent {	
 

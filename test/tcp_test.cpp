@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
-#include "tcp.h"
-#include "buffer.h"
+#include "tracker/tcp.h"
+#include "parsing/buffer.h"
 #include <iostream>
 #include <future>
 #include <chrono>

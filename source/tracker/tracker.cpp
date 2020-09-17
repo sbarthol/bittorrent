@@ -1,13 +1,13 @@
-#include "tracker.h"
+#include "tracker/tracker.h"
 #include <stdlib.h> 
 #include <time.h>
 #include <vector>
-#include "udp.h"
-#include "url.h"
+#include "tracker/udp.h"
+#include "tracker/url.h"
 #include <algorithm>
 #include <stdexcept>
-#include "peer_id.h"
-#include "bencode.h"
+#include "download/peer_id.h"
+#include "parsing/bencode.h"
 
 using namespace std;
 

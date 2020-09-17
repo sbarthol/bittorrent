@@ -1,13 +1,13 @@
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
-#include "torrent.h"
-#include "tracker.h"
-#include "buffer.h"
-#include "tcp.h"
+#include "parsing/torrent.h"
+#include "tracker/tracker.h"
+#include "parsing/buffer.h"
+#include "tracker/tcp.h"
 #include <vector>
 #include <queue>
-#include "download.h"
+#include "download/download.h"
 #include <mutex>
 
 class connection {

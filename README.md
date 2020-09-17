@@ -19,7 +19,7 @@ mkdir build
 cd build
 cmake ..
 make
-./source/BitTorrent_run <torrent_file>
+./source/BitTorrent <torrent_file>
 ```
 
 ## Testing

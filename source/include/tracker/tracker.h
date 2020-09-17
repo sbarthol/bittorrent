@@ -1,12 +1,12 @@
 #ifndef TRACKER_H
 #define TRACKER_H
 
-#include "torrent.h"
-#include "udp.h"
-#include "buffer.h"
+#include "parsing/torrent.h"
+#include "tracker/udp.h"
+#include "parsing/buffer.h"
 #include <vector>
 #include <string>
-#include "http.h"
+#include "tracker/http.h"
 
 struct peer;
 

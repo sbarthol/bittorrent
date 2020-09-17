@@ -1,8 +1,8 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H
 
-#include "torrent.h"
-#include "buffer.h"
+#include "parsing/torrent.h"
+#include "parsing/buffer.h"
 
 class message {
 

@@ -1,7 +1,7 @@
 #ifndef PEER_ID_H
 #define PEER_ID_H
 
-#include "buffer.h"
+#include "parsing/buffer.h"
 #include <string>
 
 class peer_id {

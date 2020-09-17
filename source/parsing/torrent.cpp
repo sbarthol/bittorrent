@@ -1,7 +1,7 @@
-#include "torrent.h"
+#include "parsing/torrent.h"
 #include <iterator>
 #include <fstream>
-#include "bencode.h"
+#include "parsing/bencode.h"
 #include <openssl/sha.h>
 
 using namespace std;

@@ -1,7 +1,7 @@
-#include "download.h"
+#include "download/download.h"
 #include <thread>
 #include <iostream>
-#include "connection.h"
+#include "download/connection.h"
 #include <algorithm>
 
 using namespace std;

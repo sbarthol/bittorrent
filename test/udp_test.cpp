@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
-#include "udp.h"
-#include "buffer.h"
+#include "tracker/udp.h"
+#include "parsing/buffer.h"
 #include <iostream>
 #include <future>
 #include <chrono>

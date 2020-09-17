@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
-#include "buffer.h"
-#include "url.h"
-#include "http.h"
+#include "parsing/buffer.h"
+#include "tracker/url.h"
+#include "tracker/http.h"
 #include <iostream>
 
 using namespace std;

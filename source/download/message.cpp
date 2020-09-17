@@ -1,5 +1,5 @@
-#include "message.h"
-#include "peer_id.h"
+#include "download/message.h"
+#include "download/peer_id.h"
 
 using namespace std;
 

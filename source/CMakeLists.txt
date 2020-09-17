@@ -1,12 +1,12 @@
 set(BINARY ${CMAKE_PROJECT_NAME})
 
-file(GLOB_RECURSE SOURCES *.h *.cpp)
+file(GLOB_RECURSE SOURCES *.cpp)
 
 set(SOURCES ${SOURCES})
 
-add_executable(${BINARY}_run ${SOURCES})
+add_executable(${BINARY} ${SOURCES})
 
-target_link_libraries(${BINARY}_run -lcrypto -lpthread)
+target_link_libraries(${BINARY} -lcrypto -lpthread)
 
 add_library(${BINARY}_lib STATIC ${SOURCES})
 
