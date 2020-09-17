@@ -19,6 +19,7 @@ private:
 	static std::vector<peer> get_peers(const buffer& b);
 
 public:
+	tracker() = delete;
 	static std::vector<peer> get_peers(const torrent& e);
 };
 

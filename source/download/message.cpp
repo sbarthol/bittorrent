@@ -96,20 +96,20 @@ buffer message::build_request(unsigned int index,
 
 	for(int i=0;i<4;i++) {
 
-		b[5+3-i] = index % 256;
-		index /= 256;
+		b[5+3-i] = index & 0xff;
+		index >>= 8;
 	}
 
 	for(int i=0;i<4;i++) {
 
-		b[9+3-i] = begin % 256;
-		begin /= 256;
+		b[9+3-i] = begin & 0xff;
+		begin >>= 8;
 	}
 
 	for(int i=0;i<4;i++) {
 
-		b[13+3-i] = length % 256;
-		length /= 256;
+		b[13+3-i] = length & 0xff;
+		length >>= 8;
 	}
 
 	return b;
