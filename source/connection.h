@@ -8,6 +8,7 @@
 #include <vector>
 #include <queue>
 #include "download.h"
+#include <mutex>
 
 class connection {
 
@@ -33,6 +34,7 @@ private:
 	bool handshake;
 	download& d;
 	tcp socket;
+	static std::mutex m;
 
 	struct job {
 		int index;

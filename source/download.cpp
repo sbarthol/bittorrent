@@ -7,14 +7,19 @@
 using namespace std;
 
 download::download(const vector<peer>& peers, torrent& t): 
-														t(t), peers(peers) {
+						t(t), peers(peers), received_count(0), requested_count(0) {
 
 	requested = vector<vector<bool>>(t.pieces);
 	received = vector<vector<bool>>(t.pieces);
 
+	total_blocks = 0;
+
 	for(int i=0;i<t.pieces;i++) {
-		requested[i] = vector<bool>(t.get_n_blocks(i));
-		received[i] = vector<bool>(t.get_n_blocks(i));
+
+		int n = t.get_n_blocks(i);
+		total_blocks += n;
+		requested[i] = vector<bool>(n);
+		received[i] = vector<bool>(n);
 	}
 }
 
@@ -22,7 +27,7 @@ void download::start() {
 
 	if(peers.size() == 0) throw runtime_error("no peers");
 
-	vector<thread> threads(5);
+	vector<thread> threads(10);
 	for(int i=0;i<threads.size();i++) {
 
 		threads[i] = thread([this,i](){
@@ -44,30 +49,21 @@ void download::start() {
 
 void download::add_requested(int piece, int block) {
 
-	lock_guard<mutex> l(requested_mutex);
+	requested_count++;
 	requested[piece][block] = true;
 }
 
 void download::add_received(int piece, int block) {
 
-	lock_guard<mutex> l(received_mutex);
+	received_count++;
 	received[piece][block] = true;
 }
 
 bool download::is_needed(int piece, int block) {
 
-	scoped_lock sl(received_mutex, requested_mutex);
-
-	bool all_flag=true;
-	// todo: use a counter
-	for_each(requested.begin(), requested.end(), [&all_flag](vector<bool> blocks){
-		for_each(blocks.begin(), blocks.end(), [&all_flag](bool x){
-			all_flag = all_flag && x;
-		});
-	});
-
-	if(all_flag) {
+	if(requested_count == total_blocks) {
 		copy(received.begin(), received.end(), requested.begin());
+		requested_count = received_count;
 	}
 
 	return !requested[piece][block];
@@ -76,13 +72,16 @@ bool download::is_needed(int piece, int block) {
 
 bool download::is_done() {
 
-	bool all_flag=true;
-	// todo: use a counter
-	for_each(received.begin(), received.end(), [&all_flag](vector<bool> blocks){
-		for_each(blocks.begin(), blocks.end(), [&all_flag](bool x){
-			all_flag = all_flag && x;
-		});
-	});
+	return received_count == total_blocks;
+}
 
-	return all_flag;
+double download::completed() {
+
+	return (double)received_count / total_blocks;
+}
+
+void download::write_to_file(int index, int begin, buffer& piece) {
+
+
+
 }

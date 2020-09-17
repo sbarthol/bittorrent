@@ -112,7 +112,6 @@ buffer message::build_request(unsigned int index,
 		length /= 256;
 	}
 
-	print(b);
 	return b;
 }
 

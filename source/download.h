@@ -1,7 +1,6 @@
 #ifndef DOWNLOAD_H
 #define DOWNLOAD_H
 
-#include <mutex>
 #include <vector>
 #include "tracker.h"
 
@@ -13,8 +12,9 @@ private:
 	const std::vector<peer>& peers;
 	torrent& t;
 
-	std::mutex requested_mutex;
-	std::mutex received_mutex;
+	int received_count;
+	int requested_count;
+	int total_blocks;
 
 public:
 	download(const std::vector<peer>& peers, torrent& t);
@@ -23,6 +23,8 @@ public:
 	bool is_needed(int piece, int block);
 	bool is_done();
 	void start();
+	void write_to_file(int index, int begin, buffer& piece);
+	double completed();
 };
 
 #endif // DOWNLOAD_H
