@@ -10,6 +10,7 @@
 #include "download/connection.h"
 #include "download/download.h"
 #include <cstdlib>
+#include <cassert>
 
 using namespace std;
 

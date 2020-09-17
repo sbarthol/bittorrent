@@ -162,8 +162,6 @@ void connection::piece_handler(buffer& b) {
 	unsigned int index = getBE32(b, 5);
 	unsigned int begin = getBE32(b, 9);
 
-	cout<<"tid "<< this_thread::get_id() <<":\t piece received, piece = "<<index<<", block = "<<begin<<", completed = "<<100.0*d.completed()<<endl;
-
 	b.erase(b.begin(), b.begin() + 9);
 
 	assert(begin % BLOCK_SIZE == 0);
@@ -172,14 +170,18 @@ void connection::piece_handler(buffer& b) {
 	unique_lock<mutex> lock(m);
 
 	assert(begin % BLOCK_SIZE == 0);
-
 	d.add_received(index, begin / BLOCK_SIZE);
+
+	cout<<"tid "<< this_thread::get_id() <<":\t piece received, piece = "<<index<<", block = "<<begin<<", completed = "<<100.0*d.completed()<<endl;
+
 	if(d.is_done()) {
 
 		cout<<"Download complete!"<<endl;
 		lock.unlock();
 		socket.close();
+
 	}else{
+		
 		lock.unlock();
 		request_piece();
 	}
