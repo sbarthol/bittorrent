@@ -116,12 +116,12 @@ vector<peer> tracker::get_peers(const torrent& t) {
 		return get_peers(c);
 
 	} else if (t.url.protocol == url_t::HTTP) {
-
-		http request(t.url);
-		build_ann_req_http(request, t);
+		
 		buffer encoded;
 
 		while(encoded.size() == 0) {
+			http request(t.url);
+			build_ann_req_http(request, t);
 			encoded = request.get();
 		}
 
