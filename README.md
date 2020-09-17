@@ -8,8 +8,8 @@ BitTorrent is a small torrenting client written from scratch in C++. The only ex
 information like the tracker url (udp or http), the file name, file size, the piece length etc...
 * Request the peer list from the tracker. If all goes well, the tracker will respond with
 a list of (ip,port) pairs.
-* Start downloading the torrent by sending messages over TCP. First send a handshake, then
-listen to the "have" and "bitfield" messages to know what pieces the peer has. Once you receive
+* Start downloading the file by sending messages over TCP. First do the BitTorrent "handshake", then
+listen to the "have" and "bitfield" messages to know what pieces each peer has. Once you receive
 an "unchoke" message, start requesting piece blocks.
 
 ## Build
