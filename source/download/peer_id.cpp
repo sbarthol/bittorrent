@@ -15,7 +15,6 @@ void peer_id::generate(const std::string& pref) {
 
 	static const char *alnum = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
-	srand(time(NULL));
 	id = buffer();
 
 	copy(pref.begin(),pref.end(),back_inserter(id));

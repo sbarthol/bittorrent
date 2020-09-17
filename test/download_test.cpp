@@ -9,12 +9,15 @@
 #include "download/peer_id.h"
 #include "download/connection.h"
 #include "download/download.h"
+#include <cstdlib>
 
 using namespace std;
 
 TEST(connection, goosebumps) {
 
+    srand(time(NULL));
     peer_id::generate();
+    // randomize()
 
     torrent t("../goosebumps.torrent");
     EXPECT_EQ(t.pieces, 4201);
