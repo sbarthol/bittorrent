@@ -3,6 +3,8 @@
 #include <fstream>
 #include "parsing/bencode.h"
 #include <openssl/sha.h>
+#include <stdlib.h>
+#include <iostream>
 
 using namespace std;
 
@@ -68,6 +70,9 @@ long long torrent::get_length(const bencode::item& item) {
 
 	bencode::item info = item.get_item("info");
 	if(info.key_present("files")) {
+
+		cout<<"For now, the app handles only single file torrents"<<endl;
+		exit(0);
 
 		vector<bencode::item> files = info.get_list("files");
 		for (bencode::item& file:files) {
