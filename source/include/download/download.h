@@ -4,6 +4,7 @@
 #include <vector>
 #include "tracker/tracker.h"
 #include <fstream>
+#include <mutex>
 
 class download {
 
@@ -19,15 +20,20 @@ private:
 
 	std::ofstream out;
 
+	bool is_done();
+	void show_progress_bar(double progress);
+
 public:
 	download(const std::vector<peer>& peers, torrent& t);
 	void add_requested(int piece, int block);
-	void add_received(int piece, int block);
+	void add_received(int piece, int block, buffer b);
 	bool is_needed(int piece, int block);
-	bool is_done();
+	
 	void start();
-	void write_to_file(int piece, int offset, buffer& piece_data);
 	double completed();
+
+	std::mutex m;
+	static const int BLOCK_SIZE = (1<<14);
 };
 
 #endif // DOWNLOAD_H

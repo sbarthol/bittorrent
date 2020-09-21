@@ -8,14 +8,7 @@
 #include "download/message.h"
 #include <cassert>
 
-
-// Todo enlever
-#include <iostream>
-#include <thread>
-
 using namespace std;
-
-mutex connection::m;
 
 connection::connection(const peer& p, torrent& t, download& d): p(p), d(d), t(t), buff(buffer()), 
 	handshake(true), choked(true), socket(p.host, p.port) {}
@@ -24,8 +17,6 @@ void connection::start_download() {
 
 	socket.send(message::build_handshake(t));
 
-	cout<<"tid "<< this_thread::get_id() <<":\t handshake sent"<<endl;
-
 	buffer b;
 
 	while(!socket.closed()) {
@@ -33,10 +24,6 @@ void connection::start_download() {
 		b = get_message(socket);
 
 		if(handshake) {
-
-			// ignore b
-			// Todo do some checks on the handshake
-			cout<<"tid "<< this_thread::get_id() <<":\t handshake received"<<endl;
 
 			socket.send(message::build_interested());
 			handshake = false;
@@ -75,13 +62,11 @@ void connection::start_download() {
 
 void connection::choke_handler() {
 
-	cout<<"tid "<< this_thread::get_id() <<":\t choke received"<<endl;
 	socket.close();
 }
 
 void connection::unchoke_handler() {
 
-	cout<<"tid "<< this_thread::get_id() <<":\t unchoke received"<<endl;
 	choked = false;
 	request_piece();
 }
@@ -92,7 +77,6 @@ void connection::have_handler(buffer& b) {
 	if(piece >= t.pieces) 
 		throw runtime_error("have message contains invalid piece");
 
-	cout<<"tid "<< this_thread::get_id() <<":\t have received, piece = "<<piece<<endl;
 	enqueue(piece);
 
 	if(q.size() == 1) {
@@ -102,7 +86,6 @@ void connection::have_handler(buffer& b) {
 
 void connection::bitfield_handler(buffer& b) {
 
-	cout<<"tid "<< this_thread::get_id() <<":\t bitfield received"<<endl;
 	bool empty = q.empty();
 
 	unsigned int n_bytes = getBE32(b,0) - 1;
@@ -136,18 +119,17 @@ void connection::request_piece() {
 		job j = q.front();
 		q.pop();
 
-		unique_lock<mutex> lock(m);
+		unique_lock<mutex> lock(d.m);
 
-		assert(j.begin % BLOCK_SIZE == 0);
+		assert(j.begin % download::BLOCK_SIZE == 0);
 
-		if(d.is_needed(j.index, j.begin / BLOCK_SIZE)) {
+		if(d.is_needed(j.index, j.begin / download::BLOCK_SIZE)) {
 
-			assert(j.begin % BLOCK_SIZE == 0);
-			d.add_requested(j.index, j.begin / BLOCK_SIZE);
+			assert(j.begin % download::BLOCK_SIZE == 0);
+			d.add_requested(j.index, j.begin / download::BLOCK_SIZE);
 			lock.unlock();
 
 			socket.send(message::build_request(j.index, j.begin, j.length));
-			cout<<"tid "<< this_thread::get_id() <<":\t request sent, piece = "<<j.index<<", block = "<<j.begin<<endl;
 			
 			break;
 
@@ -164,27 +146,15 @@ void connection::piece_handler(buffer& b) {
 
 	b.erase(b.begin(), b.begin() + 9);
 
-	assert(begin % BLOCK_SIZE == 0);
-	d.write_to_file(index, begin, b);
+	assert(begin % download::BLOCK_SIZE == 0);
 
-	unique_lock<mutex> lock(m);
+	unique_lock<mutex> lock(d.m);
 
-	assert(begin % BLOCK_SIZE == 0);
-	d.add_received(index, begin / BLOCK_SIZE);
+	assert(begin % download::BLOCK_SIZE == 0);
+	d.add_received(index, begin / download::BLOCK_SIZE, b);
 
-	cout<<"tid "<< this_thread::get_id() <<":\t piece received, piece = "<<index<<", block = "<<begin<<", completed = "<<100.0*d.completed()<<endl;
-
-	if(d.is_done()) {
-
-		cout<<"Download complete!"<<endl;
-		lock.unlock();
-		socket.close();
-
-	}else{
-		
-		lock.unlock();
-		request_piece();
-	}
+	lock.unlock();
+	request_piece();
 }
 
 buffer connection::get_message(tcp& client) {
@@ -211,7 +181,6 @@ void connection::enqueue(int piece) {
 
 	int n_blocks = t.get_n_blocks(piece);
 	for(int i=0;i<n_blocks;i++) {
-		cout<<"added to queue: piece: "<<piece<<", block: "<<i*t.BLOCK_SIZE<<endl;
-		q.push(job(piece, i*t.BLOCK_SIZE, t.get_block_length(piece, i)));
+		q.push(job(piece, i*download::BLOCK_SIZE, t.get_block_length(piece, i)));
 	}
 }

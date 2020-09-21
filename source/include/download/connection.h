@@ -25,8 +25,6 @@ private:
 
 	void enqueue(int piece);
 
-	static const int BLOCK_SIZE = (1<<14);
-
 	buffer buff;
 	const peer& p;
 	torrent& t;
@@ -34,7 +32,6 @@ private:
 	bool handshake;
 	download& d;
 	tcp socket;
-	static std::mutex m;
 
 	struct job {
 		int index;

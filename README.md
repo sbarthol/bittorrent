@@ -12,6 +12,9 @@ a list of (ip,port) pairs.
 listen to the "have" and "bitfield" messages to know what pieces each peer has. Once you receive
 an "unchoke" message, start requesting piece blocks.
 
+## Demo
+![demo](demo.gif)
+
 ## Build
 
 Run the following commands:
