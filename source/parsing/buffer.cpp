@@ -44,12 +44,9 @@ buffer setBE16(unsigned int n, buffer& b, const buffer::size_type idx) {
 
 void print(const buffer& b) {
 
+	cout<<hex;
 	for(unsigned char c:b){
-		if(32<=c&&c<128){
-			cout<<c;
-		}else{
-			cout<<"0x"<<hex<<(unsigned int)c<<" "<<dec;
-		}
+		cout<<"0x"<<(unsigned int)c<<" ";
 	}
-	cout<<endl;
+	cout<<endl<<dec;
 }

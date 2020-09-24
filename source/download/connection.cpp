@@ -141,16 +141,24 @@ void connection::request_piece() {
 
 void connection::piece_handler(buffer& b) {
 
+	unsigned int block_size = getBE32(b, 0) - 9;
+	if (block_size > download::BLOCK_SIZE) {
+		throw runtime_error("received a wrong blocksize");
+	}
+
 	unsigned int index = getBE32(b, 5);
 	unsigned int begin = getBE32(b, 9);
 
-	b.erase(b.begin(), b.begin() + 9);
+	b.erase(b.begin(), b.begin() + 13);
+	
+	// Todo verify hash corresponds
 
-	assert(begin % download::BLOCK_SIZE == 0);
+	assert(b.size() == block_size);
+	if (begin % download::BLOCK_SIZE != 0) {
+		throw runtime_error("received a wrong begin");
+	}
 
 	unique_lock<mutex> lock(d.m);
-
-	assert(begin % download::BLOCK_SIZE == 0);
 	d.add_received(index, begin / download::BLOCK_SIZE, b);
 
 	lock.unlock();

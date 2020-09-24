@@ -31,6 +31,7 @@ void download::start() {
 	if(peers.size() == 0) throw runtime_error("no peers");
 
 	cout<<"Wait for the download to complete ..."<<endl;
+	show_progress_bar(0.0);
 
 	int n_threads = min(vector<peer>::size_type(10), peers.size());
 	vector<thread> threads(n_threads);
