@@ -13,7 +13,7 @@ listen to the "have" and "bitfield" messages to know what pieces each peer has. 
 an "unchoke" message, start requesting piece blocks.
 * To determine which piece is to be requested next by a connection, I used a priority queue that keeps the least requested pieces on top. When I pop, I check whether the piece has been received.
 * In order to read from multiple TCP sockets at the same time in one single thread, I used the epoll facility (Linux kernel 2.5.44 and above).
-* Worker threads are responsible for handling the received data and writing it to the disk.
+* A worker thread buffers the received data and flushes it to the disk from time to time.
 
 ## Demo
 ![demo](demo.gif)

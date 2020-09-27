@@ -3,8 +3,8 @@
 
 #include <vector>
 #include "tracker/tracker.h"
-#include <fstream>
 #include <queue>
+#include "download/worker.h"
 
 class download {
 
@@ -14,10 +14,10 @@ private:
 	const std::vector<peer>& peers;
 	torrent& t;
 
+	writer w;
+
 	int received_count;
 	int total_blocks;
-
-	std::ofstream out;
 
 	void show_progress_bar(double progress);
 

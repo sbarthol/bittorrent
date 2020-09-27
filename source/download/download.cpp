@@ -10,8 +10,7 @@
 using namespace std;
 
 download::download(const vector<peer>& peers, torrent& t): 
-						t(t), peers(peers), received_count(0), 
-						out(t.name, ios::binary) {
+						t(t), peers(peers), received_count(0), w(t.name) {
 
 	received = vector<vector<bool>>(t.pieces);
 	is_in_queue = vector<vector<bool>>(t.pieces);
@@ -44,8 +43,10 @@ void download::start() {
 		}
 	}
 
+	w.start();
 	farm f(conns, *this);
 	f.hatch();
+	w.stop();
 	cout<<endl<<"Download completed successfully!"<<endl;
 }
 
@@ -57,8 +58,7 @@ void download::add_received(int piece, int block, buffer piece_data) {
 	if(received[piece][block]) return;
 
 	int offset = block * BLOCK_SIZE;
-	out.seekp(piece * t.piece_length + offset, ios::beg);
-	out.write(reinterpret_cast<char*>(piece_data.data()), piece_data.size());
+	w.add(piece_data, piece * t.piece_length + offset);
 
 	received_count++;
 	received[piece][block] = true;
