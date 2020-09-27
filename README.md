@@ -18,7 +18,7 @@ an "unchoke" message, start requesting piece blocks.
 ## Demo
 ![demo](demo.gif)
 
-## Build
+## Build & Run
 
 Run the following commands:
 
