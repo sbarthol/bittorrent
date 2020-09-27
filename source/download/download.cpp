@@ -11,10 +11,10 @@ using namespace std;
 
 download::download(const vector<peer>& peers, torrent& t): 
 						t(t), peers(peers), received_count(0), 
-						requested_count(0), out(t.name, ios::binary) {
+						out(t.name, ios::binary) {
 
-	requested = vector<vector<bool>>(t.pieces);
 	received = vector<vector<bool>>(t.pieces);
+	is_in_queue = vector<vector<bool>>(t.pieces);
 
 	total_blocks = 0;
 
@@ -22,7 +22,7 @@ download::download(const vector<peer>& peers, torrent& t):
 
 		int n = t.get_n_blocks(i);
 		total_blocks += n;
-		requested[i] = vector<bool>(n);
+		is_in_queue[i] = vector<bool>(n);
 		received[i] = vector<bool>(n);
 	}
 }
@@ -47,17 +47,6 @@ void download::start() {
 	farm f(conns, *this);
 	f.hatch();
 	cout<<endl<<"Download completed successfully!"<<endl;
-}
-
-void download::add_requested(int piece, int block) {
-
-	assert(piece >= 0 && piece < t.pieces);
-	assert(block >= 0 && block < t.get_n_blocks(piece));
-
-	if(requested[piece][block]) return;
-
-	requested_count++;
-	requested[piece][block] = true;
 }
 
 void download::add_received(int piece, int block, buffer piece_data) {
@@ -93,20 +82,6 @@ void download::show_progress_bar(double progress) {
 	cout.flush();
 }
 
-bool download::is_needed(int piece, int block) {
-
-	assert(piece >= 0 && piece < t.pieces);
-	assert(block >= 0 && block < t.get_n_blocks(piece));
-
-	if(requested_count == total_blocks) {
-		copy(received.begin(), received.end(), requested.begin());
-		requested_count = received_count;
-	}
-
-	return !requested[piece][block];
-
-}
-
 bool download::is_done() {
 
 	bool is_done = received_count == total_blocks;
@@ -133,5 +108,37 @@ bool download::is_done() {
 double download::completed() {
 
 	return (double)received_count / total_blocks;
+}
+
+void download::push_job(job j) {
+
+	assert(j.index >= 0 && j.index < t.pieces);
+	assert(j.begin % BLOCK_SIZE == 0);
+	assert(j.begin / BLOCK_SIZE >= 0 && j.begin / BLOCK_SIZE < t.get_n_blocks(j.index));
+	assert(0 < j.length && j.length <= BLOCK_SIZE);
+
+	if (is_in_queue[j.index][j.begin / BLOCK_SIZE]) {
+		return;
+	}
+
+	is_in_queue[j.index][j.begin / BLOCK_SIZE] = true;
+	jobs.push(j);
+}
+
+download::job download::pop_job() {
+
+	while(!jobs.empty()) {
+		
+		job j = jobs.top();
+		jobs.pop();
+		if(!received[j.index][j.begin / BLOCK_SIZE]) {
+
+			j.requested++;
+			jobs.push(j);
+			return j;
+		}
+	}
+
+	throw exception();
 }
 

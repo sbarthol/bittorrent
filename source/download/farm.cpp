@@ -48,13 +48,6 @@ void farm::hatch() {
 
 			if(mask & (EPOLLRDHUP | EPOLLPRI | EPOLLERR | EPOLLHUP)) {
 
-				int res = epoll_ctl(epfd, EPOLL_CTL_DEL, conns[idx].socket.fd, nullptr);
-				if (res < 0) {
-
-					string what = strerror(errno);
-					throw runtime_error(what);
-				}
-
 				conns[idx].socket.close();
 
 				// Todo retry to connect the socket here

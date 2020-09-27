@@ -6,7 +6,6 @@
 #include "parsing/buffer.h"
 #include "tracker/tcp.h"
 #include <vector>
-#include <queue>
 #include "download/download.h"
 
 class connection {
@@ -19,9 +18,9 @@ private:
 	void have_handler(buffer& b);
 	void bitfield_handler(buffer& b);
 	void piece_handler(buffer& b);
+	void enqueue(int piece);
 
 	void request_piece();
-	void enqueue(int piece);
 
 	buffer buff;
 	const peer& p;
@@ -30,16 +29,6 @@ private:
 	bool handshake;
 	bool connected;
 	download& d;
-
-	struct job {
-		int index;
-		int begin;
-		int length;
-
-		job(int i, int b, int l): index(i), begin(b), length(l) {}
-	};
-
-	std::queue<job>q;
 
 public:
 	tcp socket;

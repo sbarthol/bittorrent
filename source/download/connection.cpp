@@ -71,15 +71,10 @@ void connection::have_handler(buffer& b) {
 		throw runtime_error("have message contains invalid piece");
 
 	enqueue(piece);
-
-	if(q.size() == 1) {
-		request_piece();
-	}
+	request_piece();
 }
 
 void connection::bitfield_handler(buffer& b) {
-
-	bool empty = q.empty();
 
 	unsigned int n_bytes = getBE32(b,0) - 1;
 	if(n_bytes != (t.pieces + 7) / 8) 
@@ -96,34 +91,24 @@ void connection::bitfield_handler(buffer& b) {
 		}
 	}
 
-	if(empty) {
-		request_piece();
-	}
+	request_piece();
 }
 
 void connection::request_piece() {
 
-	// Todo make this thread safe
-
 	if(choked) return;
 
-	while(q.size() > 0) {
+	download::job j;
 
-		job j = q.front();
-		q.pop();
-
-		assert(j.begin % download::BLOCK_SIZE == 0);
-
-		if(d.is_needed(j.index, j.begin / download::BLOCK_SIZE)) {
-
-			assert(j.begin % download::BLOCK_SIZE == 0);
-			d.add_requested(j.index, j.begin / download::BLOCK_SIZE);
-
-			socket.send(message::build_request(j.index, j.begin, j.length));
-			
-			break;
-		} 
+	try {
+		j = d.pop_job();
+	} catch(...) {
+		socket.close();
+		return;
 	}
+
+	assert(j.begin % download::BLOCK_SIZE == 0);
+	socket.send(message::build_request(j.index, j.begin, j.length));
 }
 
 void connection::piece_handler(buffer& b) {
@@ -180,6 +165,6 @@ void connection::enqueue(int piece) {
 
 	int n_blocks = t.get_n_blocks(piece);
 	for(int i=0;i<n_blocks;i++) {
-		q.push(job(piece, i*download::BLOCK_SIZE, t.get_block_length(piece, i)));
+		d.push_job(download::job(piece, i*download::BLOCK_SIZE, t.get_block_length(piece, i)));
 	}
 }
