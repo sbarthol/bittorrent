@@ -1,16 +1,18 @@
 # BitTorrent
 
-BitTorrent is a small torrenting client written from scratch in C++. The only external library used is OpenSSL for computing SHA1 hashes. Tested only on Ubuntu 18.04 plateform (Dockerfile provided).
+BitTorrent is a small torrenting client written from scratch in C++. The only external library used is OpenSSL for computing SHA1 hashes. Tested only on Ubuntu 18.04 plateform (Dockerfile provided). In particular, it used Linux specific features (eg. epoll).
 
 ## How does it work
 
 * First, parse the torrent file which is "bencoded". The torrent file contains relevant
-information like the tracker url (udp or http), the file name, file size, the piece length etc...
+information like the tracker URL (UDP or TCP/HTTP), the file name, file size, the piece length etc...
 * Request the peer list from the tracker. If all goes well, the tracker will respond with
 a list of (ip,port) pairs.
 * Start downloading the file by sending messages over TCP. First do the BitTorrent "handshake", then
 listen to the "have" and "bitfield" messages to know what pieces each peer has. Once you receive
 an "unchoke" message, start requesting piece blocks.
+* In order to read from multiple TCP sockets at the same time in one single thread, I used the epoll facility (Linux kernel 2.5.44 and above).
+* Worker threads are responsible for handling the received data and writing it to the disk.
 
 ## Demo
 ![demo](demo.gif)

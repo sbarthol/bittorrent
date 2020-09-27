@@ -4,7 +4,6 @@
 #include <vector>
 #include "tracker/tracker.h"
 #include <fstream>
-#include <mutex>
 
 class download {
 
@@ -20,7 +19,6 @@ private:
 
 	std::ofstream out;
 
-	bool is_done();
 	void show_progress_bar(double progress);
 
 public:
@@ -31,8 +29,8 @@ public:
 	
 	void start();
 	double completed();
+	bool is_done();
 
-	std::mutex m;
 	static const int BLOCK_SIZE = (1<<14);
 };
 

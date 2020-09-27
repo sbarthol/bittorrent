@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <stdlib.h>
+#include "download/farm.h"
 
 using namespace std;
 
@@ -33,25 +34,19 @@ void download::start() {
 	cout<<"Wait for the download to complete ..."<<endl;
 	show_progress_bar(0.0);
 
-	int n_threads = min(vector<peer>::size_type(10), peers.size());
-	vector<thread> threads(n_threads);
-	for(int i=0;i<threads.size();i++) {
-
-		threads[i] = thread([this,i](){
-
-			try {
-				connection conn(peers[i], t, *this);
-				conn.start_download();
-			} catch (exception& e) {
-				cout<<"thread threw: "<<e.what()<<endl;
-			}
-		});
+	vector<connection> conns;
+	for(const peer& p: peers) {
+		
+		try {
+			conns.push_back(connection(p, t, *this));
+		} catch (exception& e) {
+			cout<<"connection constructor threw: "<<e.what()<<endl;
+		}
 	}
 
-	for(thread& t:threads) {
-
-		t.join();
-	}
+	farm f(conns, *this);
+	f.hatch();
+	cout<<endl<<"Download completed successfully!"<<endl;
 }
 
 void download::add_requested(int piece, int block) {
@@ -81,11 +76,6 @@ void download::add_received(int piece, int block, buffer piece_data) {
 
 	double progress = (double)received_count / total_blocks;
 	show_progress_bar(progress);
-
-	if(is_done()) {
-		cout<<endl<<"Download completed successfully!"<<endl;
-		exit(0);
-	}
 }
 
 void download::show_progress_bar(double progress) {

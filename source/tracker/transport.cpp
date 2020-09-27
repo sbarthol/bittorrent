@@ -2,17 +2,20 @@
 #include <stdio.h>
 #include <stdexcept>
 #include <sys/socket.h>
+#include <sys/types.h> 
 #include <vector>
 #include <sys/errno.h>
 #include <arpa/inet.h>
 #include <string.h>
 #include <netdb.h>
+#include <unistd.h>
 
 using namespace std;
 
-transport::transport(string address, int port, int type) {
+transport::transport(string address, int port, int type, bool blocking) {
 
-	if ((fd = socket(AF_INET, type, 0)) < 0) { 
+	fd = socket(AF_INET, type | (blocking ? 0 : SOCK_NONBLOCK), 0);
+	if (fd < 0) { 
 
 		string what = strerror(errno);
 		throw runtime_error(what);
@@ -33,8 +36,10 @@ transport::transport(string address, int port, int type) {
 
 	if (connect(fd, (struct sockaddr*)&servaddr,sizeof(servaddr)) < 0) {
 
-		string what = strerror(errno);
-		throw runtime_error(what);
+		if (errno != EINPROGRESS) {
+			string what = strerror(errno);
+			throw runtime_error(what);
+		}
 	}
 }
 
@@ -58,4 +63,22 @@ buffer transport::receive() {
 	}
 	
 	return buffer(buff,buff+n);
+}
+
+void transport::close() {
+
+	if(closed_flag){
+		return;
+	}
+
+	if(::close(fd) < 0) {
+		std::string what = strerror(errno);
+		throw std::runtime_error(what);
+	}
+	closed_flag = true;
+}
+
+bool transport::closed() {
+
+	return closed_flag;
 }

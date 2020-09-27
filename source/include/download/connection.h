@@ -8,12 +8,11 @@
 #include <vector>
 #include <queue>
 #include "download/download.h"
-#include <mutex>
 
 class connection {
 
 private:
-	buffer get_message(tcp& client);
+	void handle(buffer& msg);
 
 	void choke_handler();
 	void unchoke_handler();
@@ -22,7 +21,6 @@ private:
 	void piece_handler(buffer& b);
 
 	void request_piece();
-
 	void enqueue(int piece);
 
 	buffer buff;
@@ -30,8 +28,8 @@ private:
 	torrent& t;
 	bool choked;
 	bool handshake;
+	bool connected;
 	download& d;
-	tcp socket;
 
 	struct job {
 		int index;
@@ -44,8 +42,9 @@ private:
 	std::queue<job>q;
 
 public:
+	tcp socket;
 	connection(const peer& p, torrent& t, download& d);
-	void start_download();
+	void ready();
 };
 
 #endif // CONNECTION_H

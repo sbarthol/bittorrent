@@ -7,55 +7,48 @@
 #include "download/connection.h"
 #include "download/message.h"
 #include <cassert>
+#include <unistd.h>
 
 using namespace std;
 
 connection::connection(const peer& p, torrent& t, download& d): p(p), d(d), t(t), buff(buffer()), 
-	handshake(true), choked(true), socket(p.host, p.port) {}
+	handshake(true), choked(true), connected(false), socket(p.host, p.port, false) {}
 
-void connection::start_download() {
+void connection::handle(buffer& msg) {
 
-	socket.send(message::build_handshake(t));
+	if (handshake) {
 
-	buffer b;
+		handshake = false;
+		socket.send(message::build_interested());
 
-	while(!socket.closed()) {
+	} else if (msg.size() < 4) {
 
-		b = get_message(socket);
+		throw runtime_error("message size less than 4");
 
-		if(handshake) {
+	} else if (msg.size() == 4) {
 
-			socket.send(message::build_interested());
-			handshake = false;
+		// keep alive message
 
-		} else {
+	} else {
 
-			if(b.size() < 4) {
-				throw runtime_error("message size less than 4");
-			} else if (b.size() == 4) {
-				// keep alive
-			} else {
-
-				switch (b[4]) {
-					case 0:
-						choke_handler();
-						break;
-					case 1:
-						unchoke_handler();
-						break;
-					case 4:
-						have_handler(b);
-						break;
-					case 5:
-						bitfield_handler(b);
-						break;
-					case 7:
-						piece_handler(b);
-						break;
-					default:
-						break;
-				}
-			}
+		switch (msg[4]) {
+			case 0:
+				choke_handler();
+				break;
+			case 1:
+				unchoke_handler();
+				break;
+			case 4:
+				have_handler(msg);
+				break;
+			case 5:
+				bitfield_handler(msg);
+				break;
+			case 7:
+				piece_handler(msg);
+				break;
+			default:
+				break;
 		}
 	}
 }
@@ -119,23 +112,17 @@ void connection::request_piece() {
 		job j = q.front();
 		q.pop();
 
-		unique_lock<mutex> lock(d.m);
-
 		assert(j.begin % download::BLOCK_SIZE == 0);
 
 		if(d.is_needed(j.index, j.begin / download::BLOCK_SIZE)) {
 
 			assert(j.begin % download::BLOCK_SIZE == 0);
 			d.add_requested(j.index, j.begin / download::BLOCK_SIZE);
-			lock.unlock();
 
 			socket.send(message::build_request(j.index, j.begin, j.length));
 			
 			break;
-
-		} else {
-			lock.unlock();
-		}
+		} 
 	}
 }
 
@@ -158,29 +145,33 @@ void connection::piece_handler(buffer& b) {
 		throw runtime_error("received a wrong begin");
 	}
 
-	unique_lock<mutex> lock(d.m);
 	d.add_received(index, begin / download::BLOCK_SIZE, b);
-
-	lock.unlock();
 	request_piece();
 }
 
-buffer connection::get_message(tcp& client) {
+void connection::ready() {
+
+	if (!connected) {
+
+		connected = true;
+		socket.send(message::build_handshake(t));
+		return;
+	}
 
 	auto length = [this](){
 		return handshake ? buff[0] + 49 : getBE32(buff,0) + 4;
 	};
 
-	while(buff.size() < 4 || buff.size() < length()) {
+	buffer b = socket.receive();
+	copy(b.begin(), b.end(), back_inserter(buff));
 
-		buffer b = client.receive();
-		copy(b.begin(), b.end(), back_inserter(buff));
+	if (buff.size() >= 4 && buff.size() >= length()) {
+
+		buffer msg(buff.begin(), buff.begin() + length());
+		buff.erase(buff.begin(), buff.begin() + length());
+
+		handle(msg);
 	}
-
-	buffer msg(buff.begin(), buff.begin() + length());
-	buff.erase(buff.begin(), buff.begin() + length());
-
-	return msg;
 }
 
 void connection::enqueue(int piece) {
