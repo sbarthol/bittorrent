@@ -25,5 +25,7 @@ int main(int argc, const char** argv) {
 	download d(v,t);
 	d.start();
 
+	cout<<endl<<"Download completed successfully!"<<endl;
+
 	return 0;
 }

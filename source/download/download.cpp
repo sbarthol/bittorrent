@@ -1,11 +1,11 @@
 #include "download/download.h"
 #include <thread>
-#include <iostream>
 #include "download/connection.h"
 #include <algorithm>
 #include <cassert>
 #include <stdlib.h>
 #include "download/farm.h"
+#include <iostream>
 
 using namespace std;
 
@@ -24,14 +24,16 @@ download::download(const vector<peer>& peers, torrent& t):
 		is_in_queue[i] = vector<bool>(n);
 		received[i] = vector<bool>(n);
 	}
+
+	s.set_total(total_blocks * BLOCK_SIZE);
 }
 
 void download::start() {
 
 	if(peers.size() == 0) throw runtime_error("no peers");
 
-	cout<<"Wait for the download to complete ..."<<endl;
-	show_progress_bar(0.0);
+	w.start();
+	s.start();
 
 	vector<connection> conns;
 	for(const peer& p: peers) {
@@ -43,11 +45,11 @@ void download::start() {
 		}
 	}
 
-	w.start();
 	farm f(conns, *this);
 	f.hatch();
+
 	w.stop();
-	cout<<endl<<"Download completed successfully!"<<endl;
+	s.stop();
 }
 
 void download::add_received(int piece, int block, buffer piece_data) {
@@ -58,28 +60,11 @@ void download::add_received(int piece, int block, buffer piece_data) {
 	if(received[piece][block]) return;
 
 	int offset = block * BLOCK_SIZE;
+	s.add(piece_data.size());
 	w.add(piece_data, piece * t.piece_length + offset);
 
 	received_count++;
 	received[piece][block] = true;
-
-	double progress = (double)received_count / total_blocks;
-	show_progress_bar(progress);
-}
-
-void download::show_progress_bar(double progress) {
-
-	int bar_width = 70;
-
-	cout << "[";
-	int pos = bar_width * progress;
-	for (int i = 0; i < bar_width; ++i) {
-		if (i < pos) cout << "=";
-		else if (i == pos) cout << ">";
-		else cout << " ";
-	}
-	cout << "] " << int(progress * 100.0) << " %\r";
-	cout.flush();
 }
 
 bool download::is_done() {

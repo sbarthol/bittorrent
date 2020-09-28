@@ -15,11 +15,10 @@ private:
 	torrent& t;
 
 	writer w;
+	speed s;
 
 	int received_count;
 	int total_blocks;
-
-	void show_progress_bar(double progress);
 
 public:
 	download(const std::vector<peer>& peers, torrent& t);
